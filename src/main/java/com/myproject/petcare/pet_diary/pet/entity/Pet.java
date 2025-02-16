@@ -9,7 +9,7 @@ import lombok.Setter;
 import org.hibernate.annotations.Comment;
 
 import java.math.BigDecimal;
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 
 @Entity
 @Getter
@@ -37,7 +37,7 @@ public class Pet extends BaseEntity {
 
     @Column(nullable = false)
     @Comment("생년월일")
-    private LocalDateTime birthDate;
+    private LocalDate birthDate;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
