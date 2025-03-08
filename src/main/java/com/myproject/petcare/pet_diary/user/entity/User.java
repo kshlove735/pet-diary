@@ -45,4 +45,8 @@ public class User extends BaseEntity {
     @Column(nullable = false)
     @Comment("역할(USER, ADMIN)")
     private Role role;
+
+    @Column(columnDefinition = "TEXT")
+    @Comment("리프레시 토근(JWT 저장)")
+    private String refreshToken;
 }
