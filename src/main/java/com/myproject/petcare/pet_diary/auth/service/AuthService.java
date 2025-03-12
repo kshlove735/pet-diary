@@ -21,7 +21,10 @@ public class AuthService {
         if(userRepository.findByEmail(userSignupDto.getEmail()).isPresent()){
             // TODO :  오류 처리 response 처리(현재 403 forbidden 코드만 내림)
             throw new RuntimeException("Email already exist");
+            //throw new DataIntegrityViolationException("Email already exist");
         }
+
+
 
         User user = new User();
         user.setEmail(userSignupDto.getEmail());

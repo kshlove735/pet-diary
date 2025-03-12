@@ -7,6 +7,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 import java.util.HashMap;
@@ -17,7 +18,7 @@ import java.util.Map;
 public class ExControllerAdvice {
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
-    public ResponseEntity<ResponseDto> validException(MethodArgumentNotValidException e) {
+    public ResponseEntity<ResponseDto<Map<String, String>>> handleValidException(MethodArgumentNotValidException e) {
         log.error("[exceptionHandler] ex", e);
 
         Map<String, String> errors = new HashMap<>();
@@ -29,9 +30,22 @@ public class ExControllerAdvice {
                     errors.put(field, defaultMessage);
                 });
 
-        ResponseDto responseDto = new ResponseDto(false, "Validation Error", errors);
+        ResponseDto<Map<String, String>> responseDto = new ResponseDto<>(false, "Validation Error", errors);
 
 
         return new ResponseEntity<>(responseDto, HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(RuntimeException.class)
+    public ResponseEntity<ResponseDto> handleRuntimeException(RuntimeException e){
+        log.error("[exceptionHandler] ex", e);
+        return new ResponseEntity<>(new ResponseDto(false, e.getMessage()), HttpStatus.BAD_REQUEST);
+    }
+
+    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+    @ExceptionHandler(Exception.class)
+    public ResponseDto handleException(Exception e){
+        log.error("[exceptionHandler] ex", e);
+        return new ResponseDto(false, e.getMessage());
     }
 }
