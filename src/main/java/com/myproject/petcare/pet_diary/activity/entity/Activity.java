@@ -18,7 +18,7 @@ public class Activity extends BaseEntity {
     @Comment("활동 기록 ID")
     private Long id;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "pet_id", nullable = false)
     @Comment("반려견 ID")
     private Pet pet;

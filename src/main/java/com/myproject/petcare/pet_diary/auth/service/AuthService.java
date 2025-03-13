@@ -7,24 +7,23 @@ import com.myproject.petcare.pet_diary.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
+@Transactional(readOnly = true)
 @RequiredArgsConstructor
 public class AuthService {
 
     private final UserRepository userRepository;
     private final BCryptPasswordEncoder bCryptPasswordEncoder;
 
+    @Transactional
     public void signup(UserSignupDto userSignupDto) {
 
         // 중복 회원 가입 검증
         if(userRepository.findByEmail(userSignupDto.getEmail()).isPresent()){
-            // TODO :  오류 처리 response 처리(현재 403 forbidden 코드만 내림)
             throw new RuntimeException("Email already exist");
-            //throw new DataIntegrityViolationException("Email already exist");
         }
-
-
 
         User user = new User();
         user.setEmail(userSignupDto.getEmail());
