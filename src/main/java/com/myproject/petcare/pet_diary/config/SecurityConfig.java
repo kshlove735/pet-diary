@@ -1,6 +1,10 @@
 package com.myproject.petcare.pet_diary.config;
 
 
+import com.myproject.petcare.pet_diary.common.exception.filter.FilterExceptionFilter;
+import com.myproject.petcare.pet_diary.jwt.CustomUserDetailsService;
+import com.myproject.petcare.pet_diary.jwt.JwtAuthenticationFilter;
+import com.myproject.petcare.pet_diary.jwt.JwtUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -9,11 +13,15 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 @Configuration
 @EnableWebSecurity
 @RequiredArgsConstructor
 public class SecurityConfig {
+
+    private final JwtUtil jwtUtil;
+    private final CustomUserDetailsService customUserDetailsService;
 
     @Bean
     public BCryptPasswordEncoder bCryptPasswordEncoder() {
@@ -42,8 +50,11 @@ public class SecurityConfig {
         http.sessionManagement((session) -> session
                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS));
 
-        // TODO : JWTFilter 등록
-        //http.addFilterBefore(new JwtAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class);
+
+        http
+                .addFilterBefore(new JwtAuthenticationFilter(jwtUtil, customUserDetailsService), UsernamePasswordAuthenticationFilter.class)
+                .addFilterBefore(new FilterExceptionFilter(), JwtAuthenticationFilter.class);
+
         return http.build();
     }
 }

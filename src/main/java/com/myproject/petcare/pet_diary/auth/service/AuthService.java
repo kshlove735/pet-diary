@@ -3,6 +3,9 @@ package com.myproject.petcare.pet_diary.auth.service;
 import com.myproject.petcare.pet_diary.auth.dto.UserLoginReqDto;
 import com.myproject.petcare.pet_diary.auth.dto.UserLoginResDto;
 import com.myproject.petcare.pet_diary.auth.dto.UserSignupReqDto;
+import com.myproject.petcare.pet_diary.common.exception.custom_exception.EmailDuplicationException;
+import com.myproject.petcare.pet_diary.common.exception.custom_exception.EmailNotFoundException;
+import com.myproject.petcare.pet_diary.common.exception.custom_exception.InvalidPasswordException;
 import com.myproject.petcare.pet_diary.jwt.JwtUtil;
 import com.myproject.petcare.pet_diary.user.entity.User;
 import com.myproject.petcare.pet_diary.user.enums.Role;
@@ -26,7 +29,7 @@ public class AuthService {
 
         // 중복 회원 가입 검증
         if (userRepository.findByEmail(userSignupReqDto.getEmail()).isPresent()) {
-            throw new RuntimeException("Email already exist");
+            throw new EmailDuplicationException("Email already exist");
         }
 
         User user = new User();
@@ -47,12 +50,12 @@ public class AuthService {
 
         // DB에 저장된 회원인지 여부 검증
         if (findUser == null) {
-            throw new RuntimeException("이메일이 존재하지 않습니다.");
+            throw new EmailNotFoundException("이메일이 존재하지 않습니다.");
         }
 
         // password 검증
         if (!bCryptPasswordEncoder.matches(userLoginReqDto.getPassword(), findUser.getPassword())) {
-            throw new RuntimeException("비밀번호가 일치하지 않습니다.");
+            throw new InvalidPasswordException("비밀번호가 일치하지 않습니다.");
         }
 
         // JWT 발급

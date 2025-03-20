@@ -3,6 +3,7 @@ package com.myproject.petcare.pet_diary.auth.service;
 import com.myproject.petcare.pet_diary.auth.dto.UserLoginReqDto;
 import com.myproject.petcare.pet_diary.auth.dto.UserLoginResDto;
 import com.myproject.petcare.pet_diary.auth.dto.UserSignupReqDto;
+import com.myproject.petcare.pet_diary.common.exception.custom_exception.*;
 import com.myproject.petcare.pet_diary.jwt.JwtUtil;
 import com.myproject.petcare.pet_diary.user.entity.User;
 import com.myproject.petcare.pet_diary.user.enums.Role;
@@ -10,6 +11,8 @@ import com.myproject.petcare.pet_diary.user.repository.UserRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -22,6 +25,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 @Transactional
 class AuthServiceTest {
 
+    private static final Logger log = LoggerFactory.getLogger(AuthServiceTest.class);
     @Autowired
     private AuthService authService;
 
@@ -93,8 +97,8 @@ class AuthServiceTest {
 
         // When : 중복 이메일 회원 가입 실행
         // Then : 예외 발생 확인
-        RuntimeException runtimeException = assertThrows(RuntimeException.class, () -> authService.signup(duplicateEmailUser));
-        assertThat(runtimeException.getMessage()).isEqualTo("Email already exist");
+        EmailDuplicationException emailDuplicationException = assertThrows(EmailDuplicationException.class, () -> authService.signup(duplicateEmailUser));
+        assertThat(emailDuplicationException.getMessage()).isEqualTo("Email already exist");
     }
 
     @Test
@@ -129,8 +133,8 @@ class AuthServiceTest {
         userLoginReqDto.setPassword("TestPassword1!!");
 
         // When & Then: 로그인 실패 -  존재하지 않는 이메일로 예외 발생
-        RuntimeException runtimeException = assertThrows(RuntimeException.class, () -> authService.login(userLoginReqDto));
-        assertThat(runtimeException.getMessage()).isEqualTo("이메일이 존재하지 않습니다.");
+        EmailNotFoundException emailNotFoundException = assertThrows(EmailNotFoundException.class, () -> authService.login(userLoginReqDto));
+        assertThat(emailNotFoundException.getMessage()).isEqualTo("이메일이 존재하지 않습니다.");
     }
 
     @Test
@@ -143,8 +147,32 @@ class AuthServiceTest {
         userLoginReqDto.setPassword("wrongPassword1!!");
 
         // When & Then: 로그인 실패 -  존재하지 않는 이메일로 예외 발생
-        RuntimeException runtimeException = assertThrows(RuntimeException.class, () -> authService.login(userLoginReqDto));
-        assertThat(runtimeException.getMessage()).isEqualTo("비밀번호가 일치하지 않습니다.");
+        InvalidPasswordException invalidPasswordException = assertThrows(InvalidPasswordException.class, () -> authService.login(userLoginReqDto));
+        assertThat(invalidPasswordException.getMessage()).isEqualTo("비밀번호가 일치하지 않습니다.");
+    }
+
+    @Test
+    @DisplayName("토근 유효성 검사")
+    void validToken() {
+
+        // 오류
+        String expiredToken = "eyJhbGciOiJIUzI1NiJ9.eyJpZCI6MSwicm9sZSI6IlVTRVIiLCJpYXQiOjE3NDI0MzI3NTcsImV4cCI6MTc0MjQzNDU1N30.ErXJo0HzaSWnV-tNMxPx0f2ys2QEJy4bfu2l6UARqW4";
+        assertThrows(ExpiredTokenException.class, () -> jwtUtil.isExpired(expiredToken));
+
+        String wrongToken = "eyJhbGciOiJSUzI1NiIsInR5cCIgOiAiSldUIiwia2lkIiA6ICJPVXFpTklBSnZCdXVLRnVicFJJbUN0TjFROXZwQkxTYTNxczhvMWpTelNNIn0.eyJleHAiOjE3NTAyNDIyMTAsImlhdCI6MTc0MjQ2NjIxMCwianRpIjoiMTA2Y2UzZmQtOTVjZS00YzQ0LWJhNDktYjU2ZDYzZTJhNmNhIiwiaXNzIjoiaHR0cHM6Ly93d3cuZmFybWluc2YuY29tL2F1dGgvcmVhbG1zL2Zhcm1pbiIsImF1ZCI6ImFjY291bnQiLCJzdWIiOiI3ZTZiNzJkYy0yMTcyLTQ5NzctOTY3ZC1lYTMyMGQ4NTk5MWYiLCJ0eXAiOiJCZWFyZXIiLCJhenAiOiJmYXJtaW4iLCJzaWQiOiJiZDQ1MzE1Yy03MDNmLTQ1MmEtODJjZS1lMDdjNWQ4OTA1NmYiLCJhY3IiOiIxIiwiYWxsb3dlZC1vcmlnaW5zIjpbImh0dHA6Ly8xMTUuMjEuNzIuMjQ4OjE2NjAwLyoiLCJodHRwczovL2lmYWN0b3J5ZmFybS5mYXJtaW5zZi5jb20vKiIsIioiLCJodHRwczovL3d3dy5mYXJtaW5zZi5jb20vYXV0aC8qIiwiLyoiLCJodHRwczovL3d3dy5mYXJtaW5zZi5jb20vKiJdLCJyZWFsbV9hY2Nlc3MiOnsicm9sZXMiOlsiUk9MRV9GQVJNRVIiLCJvZmZsaW5lX2FjY2VzcyIsIlJPTEVfQURNSU4iLCJ1bWFfYXV0aG9yaXphdGlvbiIsImRlZmF1bHQtcm9sZXMtZmFybWluIl19LCJyZXNvdXJjZV9hY2Nlc3MiOnsiYWNjb3VudCI6eyJyb2xlcyI6WyJtYW5hZ2UtYWNjb3VudCIsIm1hbmFnZS1hY2NvdW50LWxpbmtzIiwidmlldy1wcm9maWxlIl19fSwic2NvcGUiOiJvcGVuaWQgZW1haWwgcHJvZmlsZSIsImVtYWlsX3ZlcmlmaWVkIjpmYWxzZSwibmFtZSI6IuyEnOyasOyXoOyXkOyKpCDshJzsmrDsl6Dsl5DsiqQiLCJwcmVmZXJyZWRfdXNlcm5hbWUiOiJzdWh3b29tczEiLCJnaXZlbl9uYW1lIjoi7ISc7Jqw7Jeg7JeQ7IqkIiwiZmFtaWx5X25hbWUiOiLshJzsmrDsl6Dsl5DsiqQifQ.Ikf2XpIhFRcj4fQWhsj49dCtQPJnCMSoak-ImsP1MroQCGNo4nbtD0AK_mZWeIFoVyH1pjfzZuJFiM2f1cxfWPrHctXBI-tajyA8TNfzmEyfQf9bckq5lcpYEp6VtU9oqtOMORCQ2jfwJ8MhX5ahhTNEtV59zxyrx-_2OY9qwG7pGKWXUisSOhDe3SVQlglQaB06N-OMq0ntfapgZHftzu9ZMTEEIGBihCZm-ZkBjuRZugRF503JoDpGHc9XMZu_YQt0MhfxCikDDeZE0-XWTLyYQXVOdFJ9EY4TWhXINTPIFbrBe7xpxePTQlp5kOTCAF1PLs9B28y7yV6MUcq-9g";
+        assertThrows(InvalidTokenException.class, () -> jwtUtil.isExpired(wrongToken));
+
+        //String wrongSecret = "eyJhbGciOiJIUzI1NiJ9.eyJpZCI6MSwicm9sZSI6IlVTRVIiLCJpYXQiOjE3NDI0MzI3NTcsImV4cCI6MTc0MjQzNDU1N30.aoiSzFs_q3vngP5BnWiL3Tk10o51-MUTpnjztKnArK0";
+        //assertThrows(SignatureException.class, () -> jwtUtil.isExpired(wrongSecret));
+        //
+        //assertThrows(JwtException.class, () -> jwtUtil.isExpired(wrongSecret));
+
+        // 정상
+        String accessToken = jwtUtil.createAccessToken(1L, "USER");
+        String refreshToken = jwtUtil.createRefreshToken(1L);
+
+        assertThat(jwtUtil.isExpired(accessToken)).isFalse();
+        assertThat(jwtUtil.isExpired(refreshToken)).isFalse();
     }
 
 }
