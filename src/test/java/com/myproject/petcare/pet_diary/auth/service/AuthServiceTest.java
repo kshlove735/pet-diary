@@ -1,6 +1,6 @@
 package com.myproject.petcare.pet_diary.auth.service;
 
-import com.myproject.petcare.pet_diary.auth.dto.UserSignupDto;
+import com.myproject.petcare.pet_diary.auth.dto.UserSignupReqDto;
 import com.myproject.petcare.pet_diary.user.entity.User;
 import com.myproject.petcare.pet_diary.user.enums.Role;
 import com.myproject.petcare.pet_diary.user.repository.UserRepository;
@@ -31,32 +31,32 @@ class AuthServiceTest {
     @DisplayName("회원 가입 성공")
     void signupSuccess() {
         // Given : 유효한 회원 가입 데이터 준비
-        UserSignupDto userSignupDto = new UserSignupDto();
-        userSignupDto.setEmail("test@gmail.com");
-        userSignupDto.setPassword("TestPassword1!!");
-        userSignupDto.setName("테스트유저");
-        userSignupDto.setPhone("010-1234-1234");
+        UserSignupReqDto userSignupReqDto = new UserSignupReqDto();
+        userSignupReqDto.setEmail("test@gmail.com");
+        userSignupReqDto.setPassword("TestPassword1!!");
+        userSignupReqDto.setName("테스트유저");
+        userSignupReqDto.setPhone("010-1234-1234");
 
         // When : 회원 가입 실행
-        authService.signup(userSignupDto);
+        authService.signup(userSignupReqDto);
 
         // Then : 사용자가 DB에 저장된는지 확인
-        User findUser = userRepository.findByEmail(userSignupDto.getEmail()).orElse(null);
+        User findUser = userRepository.findByEmail(userSignupReqDto.getEmail()).orElse(null);
 
         assertThat(findUser).isNotNull();
-        assertThat(findUser.getEmail()).isEqualTo(userSignupDto.getEmail());
-        assertThat(findUser.getName()).isEqualTo(userSignupDto.getName());
-        assertThat(findUser.getPhone()).isEqualTo(userSignupDto.getPhone());
+        assertThat(findUser.getEmail()).isEqualTo(userSignupReqDto.getEmail());
+        assertThat(findUser.getName()).isEqualTo(userSignupReqDto.getName());
+        assertThat(findUser.getPhone()).isEqualTo(userSignupReqDto.getPhone());
         assertThat(findUser.getRole()).isEqualTo(Role.USER);
-        assertThat(findUser.getPassword()).isNotEqualTo(userSignupDto.getPassword());
-        assertThat(bCryptPasswordEncoder.matches(userSignupDto.getPassword(), findUser.getPassword())).isTrue();
+        assertThat(findUser.getPassword()).isNotEqualTo(userSignupReqDto.getPassword());
+        assertThat(bCryptPasswordEncoder.matches(userSignupReqDto.getPassword(), findUser.getPassword())).isTrue();
     }
 
     @Test
     @DisplayName("중복 이메일로 회원 가입 시도 - 예외 발생 확인")
     void signupFailDueToDuplicateEmail() {
         // Given : 동일한 이메일로 회원 가입
-        UserSignupDto existingUser = new UserSignupDto();
+        UserSignupReqDto existingUser = new UserSignupReqDto();
         existingUser.setEmail("test@gmail.com");
         existingUser.setPassword("TestPassword1!");
         existingUser.setName("테스트유저1");
@@ -64,7 +64,7 @@ class AuthServiceTest {
 
         authService.signup(existingUser);
 
-        UserSignupDto duplicateEmailUser = new UserSignupDto();
+        UserSignupReqDto duplicateEmailUser = new UserSignupReqDto();
         duplicateEmailUser.setEmail("test@gmail.com");
         duplicateEmailUser.setPassword("TestPassword1!!");
         duplicateEmailUser.setName("테스트유저2");

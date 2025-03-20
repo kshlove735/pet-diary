@@ -1,6 +1,8 @@
 package com.myproject.petcare.pet_diary.auth.controller;
 
-import com.myproject.petcare.pet_diary.auth.dto.UserSignupDto;
+import com.myproject.petcare.pet_diary.auth.dto.UserLoginReqDto;
+import com.myproject.petcare.pet_diary.auth.dto.UserLoginResDto;
+import com.myproject.petcare.pet_diary.auth.dto.UserSignupReqDto;
 import com.myproject.petcare.pet_diary.auth.service.AuthService;
 import com.myproject.petcare.pet_diary.common.dto.ResponseDto;
 import lombok.RequiredArgsConstructor;
@@ -18,9 +20,14 @@ public class AuthController {
     private final AuthService authService;
 
     @PostMapping("/auth/signup")
-    public ResponseDto signup(@RequestBody @Validated UserSignupDto userSignupDto){
-        authService.signup(userSignupDto);
+    public ResponseDto signup(@RequestBody @Validated UserSignupReqDto userSignupReqDto) {
+        authService.signup(userSignupReqDto);
+        return new ResponseDto<>(true, "회원 가입 성공", null);
+    }
 
-        return new ResponseDto(true, "Signup successful", null);
+    @PostMapping("/auth/login")
+    public ResponseDto<UserLoginResDto> login(@RequestBody @Validated UserLoginReqDto userLoginReqDto) {
+        UserLoginResDto userLoginResDto = authService.login(userLoginReqDto);
+        return new ResponseDto<>(true, "로그인 성공", userLoginResDto);
     }
 }
