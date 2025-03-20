@@ -59,7 +59,7 @@ class AuthControllerTest {
                         .content(objectMapper.writeValueAsString(userSignupReqDto)))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.success").value(false))
-                .andExpect(jsonPath("$.message").value("Validation Error"));
+                .andExpect(jsonPath("$.message").value("DTO 검증 오류"));
     }
 
     @Test
@@ -78,6 +78,6 @@ class AuthControllerTest {
                         .content(objectMapper.writeValueAsString(userSignupReqDto)))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.success").value(false))
-                .andExpect(jsonPath("$.message").value("Validation Error"));
+                .andExpect(jsonPath("$.message").value("DTO 검증 오류"));
     }
 }

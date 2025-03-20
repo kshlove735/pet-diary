@@ -98,7 +98,7 @@ class AuthServiceTest {
         // When : 중복 이메일 회원 가입 실행
         // Then : 예외 발생 확인
         EmailDuplicationException emailDuplicationException = assertThrows(EmailDuplicationException.class, () -> authService.signup(duplicateEmailUser));
-        assertThat(emailDuplicationException.getMessage()).isEqualTo("Email already exist");
+        assertThat(emailDuplicationException.getMessage()).isEqualTo("이미 등록된 유저입니다.");
     }
 
     @Test

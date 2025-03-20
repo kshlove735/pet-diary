@@ -29,7 +29,7 @@ public class AuthService {
 
         // 중복 회원 가입 검증
         if (userRepository.findByEmail(userSignupReqDto.getEmail()).isPresent()) {
-            throw new EmailDuplicationException("Email already exist");
+            throw new EmailDuplicationException("이미 등록된 유저입니다.");
         }
 
         User user = new User();

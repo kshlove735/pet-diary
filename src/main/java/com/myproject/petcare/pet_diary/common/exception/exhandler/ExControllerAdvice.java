@@ -30,7 +30,7 @@ public class ExControllerAdvice {
                     errors.put(field, defaultMessage);
                 });
 
-        ResponseDto<Map<String, String>> responseDto = new ResponseDto<>(false, "Validation Error", errors);
+        ResponseDto<Map<String, String>> responseDto = new ResponseDto<>(false, "DTO 검증 오류", errors);
 
 
         return new ResponseEntity<>(responseDto, HttpStatus.BAD_REQUEST);
