@@ -21,7 +21,8 @@ public class JwtUtil {
 
     public JwtUtil(@Value("${spring.jwt.secret}") String secretKey,
                    @Value("${spring.jwt.access-token-expiration-time}") long accessTokenExpTime,
-                   @Value("${spring.jwt.refresh-token-expiration-time}") long refreshTokenExpTime) {
+                   @Value("${spring.jwt.refresh-token-expiration-time}") long refreshTokenExpTime
+                    ) {
         this.secretKey = new SecretKeySpec(secretKey.getBytes(StandardCharsets.UTF_8), Jwts.SIG.HS256.key().build().getAlgorithm());
         this.accessTokenExpTime = accessTokenExpTime;
         this.refreshTokenExpTime = refreshTokenExpTime;

@@ -8,11 +8,10 @@ import com.myproject.petcare.pet_diary.jwt.JwtUtil;
 import com.myproject.petcare.pet_diary.user.entity.User;
 import com.myproject.petcare.pet_diary.user.enums.Role;
 import com.myproject.petcare.pet_diary.user.repository.UserRepository;
+import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -23,9 +22,9 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @SpringBootTest
 @Transactional
+@Slf4j
 class AuthServiceTest {
 
-    private static final Logger log = LoggerFactory.getLogger(AuthServiceTest.class);
     @Autowired
     private AuthService authService;
 
@@ -174,5 +173,4 @@ class AuthServiceTest {
         assertThat(jwtUtil.isExpired(accessToken)).isFalse();
         assertThat(jwtUtil.isExpired(refreshToken)).isFalse();
     }
-
 }
