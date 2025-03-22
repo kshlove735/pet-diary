@@ -1,7 +1,7 @@
 package com.myproject.petcare.pet_diary.auth.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.myproject.petcare.pet_diary.auth.dto.UserSignupReqDto;
+import com.myproject.petcare.pet_diary.auth.dto.SignupReqDto;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,16 +28,16 @@ class AuthControllerTest {
     @DisplayName("정상 회원 가입 요청")
     void signupSuccess() throws Exception {
         // Given : 유효한 회원 가입 데이터 준비
-        UserSignupReqDto userSignupReqDto = new UserSignupReqDto();
-        userSignupReqDto.setEmail("test@gmail.com");
-        userSignupReqDto.setPassword("TestPassword1!!");
-        userSignupReqDto.setName("테스트유저");
-        userSignupReqDto.setPhone("010-1234-1234");
+        SignupReqDto signupReqDto = new SignupReqDto();
+        signupReqDto.setEmail("test@gmail.com");
+        signupReqDto.setPassword("TestPassword1!!");
+        signupReqDto.setName("테스트유저");
+        signupReqDto.setPhone("010-1234-1234");
 
         // When & Then : POST 요청 후 성공 응답 확인
         mockMvc.perform(post("/v1/auth/signup")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(userSignupReqDto)))
+                        .content(objectMapper.writeValueAsString(signupReqDto)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.success").value(true))
                 .andExpect(jsonPath("$.message").value("회원 가입 성공"));
@@ -47,16 +47,16 @@ class AuthControllerTest {
     @DisplayName("유효하지 않은 이메일")
     void signupFailDueToInvalidEmail() throws Exception {
         // Given : 유효한 회원 가입 데이터 준비
-        UserSignupReqDto userSignupReqDto = new UserSignupReqDto();
-        userSignupReqDto.setEmail("test_gmail.com");
-        userSignupReqDto.setPassword("TestPassword1!!");
-        userSignupReqDto.setName("테스트유저");
-        userSignupReqDto.setPhone("010-1234-1234");
+        SignupReqDto signupReqDto = new SignupReqDto();
+        signupReqDto.setEmail("test_gmail.com");
+        signupReqDto.setPassword("TestPassword1!!");
+        signupReqDto.setName("테스트유저");
+        signupReqDto.setPhone("010-1234-1234");
 
         // When & Then : POST 요청 후 성공 응답 확인
         mockMvc.perform(post("/v1/auth/signup")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(userSignupReqDto)))
+                        .content(objectMapper.writeValueAsString(signupReqDto)))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.success").value(false))
                 .andExpect(jsonPath("$.message").value("DTO 검증 오류"));
@@ -66,16 +66,16 @@ class AuthControllerTest {
     @DisplayName("비밀번호 패턴 불일치")
     void signupFailDueToInvalidPassword() throws Exception {
         // Given : 유효한 회원 가입 데이터 준비
-        UserSignupReqDto userSignupReqDto = new UserSignupReqDto();
-        userSignupReqDto.setEmail("test_gmail.com");
-        userSignupReqDto.setPassword("Test!");
-        userSignupReqDto.setName("테스트유저");
-        userSignupReqDto.setPhone("010-1234-1234");
+        SignupReqDto signupReqDto = new SignupReqDto();
+        signupReqDto.setEmail("test_gmail.com");
+        signupReqDto.setPassword("Test!");
+        signupReqDto.setName("테스트유저");
+        signupReqDto.setPhone("010-1234-1234");
 
         // When & Then : POST 요청 후 성공 응답 확인
         mockMvc.perform(post("/v1/auth/signup")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(userSignupReqDto)))
+                        .content(objectMapper.writeValueAsString(signupReqDto)))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.success").value(false))
                 .andExpect(jsonPath("$.message").value("DTO 검증 오류"));

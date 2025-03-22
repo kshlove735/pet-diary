@@ -1,8 +1,8 @@
 package com.myproject.petcare.pet_diary.auth.service;
 
-import com.myproject.petcare.pet_diary.auth.dto.UserLoginReqDto;
-import com.myproject.petcare.pet_diary.auth.dto.UserLoginResDto;
-import com.myproject.petcare.pet_diary.auth.dto.UserSignupReqDto;
+import com.myproject.petcare.pet_diary.auth.dto.LoginReqDto;
+import com.myproject.petcare.pet_diary.auth.dto.LoginResDto;
+import com.myproject.petcare.pet_diary.auth.dto.SignupReqDto;
 import com.myproject.petcare.pet_diary.common.exception.custom_exception.*;
 import com.myproject.petcare.pet_diary.jwt.JwtUtil;
 import com.myproject.petcare.pet_diary.user.entity.User;
@@ -23,18 +23,18 @@ public class AuthService {
     private final JwtUtil jwtUtil;
 
     @Transactional
-    public void signup(UserSignupReqDto userSignupReqDto) {
+    public void signup(SignupReqDto signupReqDto) {
 
         // 중복 회원 가입 검증
-        if (userRepository.findByEmail(userSignupReqDto.getEmail()).isPresent()) {
+        if (userRepository.findByEmail(signupReqDto.getEmail()).isPresent()) {
             throw new EmailDuplicationException("이미 등록된 유저입니다.");
         }
 
         User user = new User();
-        user.setEmail(userSignupReqDto.getEmail());
-        user.setPassword(bCryptPasswordEncoder.encode(userSignupReqDto.getPassword()));
-        user.setName(userSignupReqDto.getName());
-        user.setPhone(userSignupReqDto.getPhone());
+        user.setEmail(signupReqDto.getEmail());
+        user.setPassword(bCryptPasswordEncoder.encode(signupReqDto.getPassword()));
+        user.setName(signupReqDto.getName());
+        user.setPhone(signupReqDto.getPhone());
         user.setRole(Role.USER); // TODO : 유저, 관리자 권한에 따른 동적 회원 가입
 
         // 회원 정보 DB 저장
@@ -43,8 +43,8 @@ public class AuthService {
 
 
     @Transactional
-    public UserLoginResDto login(UserLoginReqDto userLoginReqDto) {
-        User findUser = userRepository.findByEmail(userLoginReqDto.getEmail()).orElse(null);
+    public LoginResDto login(LoginReqDto loginReqDto) {
+        User findUser = userRepository.findByEmail(loginReqDto.getEmail()).orElse(null);
 
         // DB에 저장된 회원인지 여부 검증
         if (findUser == null) {
@@ -52,7 +52,7 @@ public class AuthService {
         }
 
         // password 검증
-        if (!bCryptPasswordEncoder.matches(userLoginReqDto.getPassword(), findUser.getPassword())) {
+        if (!bCryptPasswordEncoder.matches(loginReqDto.getPassword(), findUser.getPassword())) {
             throw new InvalidPasswordException("비밀번호가 일치하지 않습니다.");
         }
 
@@ -64,7 +64,7 @@ public class AuthService {
         findUser.setRefreshToken(refreshToken);
 
         // return JWT 토큰
-        return new UserLoginResDto(accessToken, refreshToken);
+        return new LoginResDto(accessToken, refreshToken);
     }
 
     @Transactional

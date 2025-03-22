@@ -1,8 +1,8 @@
 package com.myproject.petcare.pet_diary.auth.service;
 
-import com.myproject.petcare.pet_diary.auth.dto.UserLoginReqDto;
-import com.myproject.petcare.pet_diary.auth.dto.UserLoginResDto;
-import com.myproject.petcare.pet_diary.auth.dto.UserSignupReqDto;
+import com.myproject.petcare.pet_diary.auth.dto.LoginReqDto;
+import com.myproject.petcare.pet_diary.auth.dto.LoginResDto;
+import com.myproject.petcare.pet_diary.auth.dto.SignupReqDto;
 import com.myproject.petcare.pet_diary.common.exception.custom_exception.*;
 import com.myproject.petcare.pet_diary.jwt.JwtUtil;
 import com.myproject.petcare.pet_diary.user.entity.User;
@@ -55,32 +55,32 @@ class AuthServiceTest {
     @DisplayName("회원 가입 성공")
     void signupSuccess() {
         // Given : 유효한 회원 가입 데이터 준비
-        UserSignupReqDto userSignupReqDto = new UserSignupReqDto();
-        userSignupReqDto.setEmail("test@gmail.com");
-        userSignupReqDto.setPassword("TestPassword1!!");
-        userSignupReqDto.setName("테스트유저");
-        userSignupReqDto.setPhone("010-1234-1234");
+        SignupReqDto signupReqDto = new SignupReqDto();
+        signupReqDto.setEmail("test@gmail.com");
+        signupReqDto.setPassword("TestPassword1!!");
+        signupReqDto.setName("테스트유저");
+        signupReqDto.setPhone("010-1234-1234");
 
         // When : 회원 가입 실행
-        authService.signup(userSignupReqDto);
+        authService.signup(signupReqDto);
 
         // Then : 사용자가 DB에 저장된는지 확인
-        User findUser = userRepository.findByEmail(userSignupReqDto.getEmail()).orElse(null);
+        User findUser = userRepository.findByEmail(signupReqDto.getEmail()).orElse(null);
 
         assertThat(findUser).isNotNull();
-        assertThat(findUser.getEmail()).isEqualTo(userSignupReqDto.getEmail());
-        assertThat(findUser.getName()).isEqualTo(userSignupReqDto.getName());
-        assertThat(findUser.getPhone()).isEqualTo(userSignupReqDto.getPhone());
+        assertThat(findUser.getEmail()).isEqualTo(signupReqDto.getEmail());
+        assertThat(findUser.getName()).isEqualTo(signupReqDto.getName());
+        assertThat(findUser.getPhone()).isEqualTo(signupReqDto.getPhone());
         assertThat(findUser.getRole()).isEqualTo(Role.USER);
-        assertThat(findUser.getPassword()).isNotEqualTo(userSignupReqDto.getPassword());
-        assertThat(bCryptPasswordEncoder.matches(userSignupReqDto.getPassword(), findUser.getPassword())).isTrue();
+        assertThat(findUser.getPassword()).isNotEqualTo(signupReqDto.getPassword());
+        assertThat(bCryptPasswordEncoder.matches(signupReqDto.getPassword(), findUser.getPassword())).isTrue();
     }
 
     @Test
     @DisplayName("회원 가입 실패 - 중복 이메일로 회원 가입 시도")
     void signupFailDueToDuplicateEmail() {
         // Given : 동일한 이메일로 회원 가입
-        UserSignupReqDto existingUser = new UserSignupReqDto();
+        SignupReqDto existingUser = new SignupReqDto();
         existingUser.setEmail("test@gmail.com");
         existingUser.setPassword("TestPassword1!");
         existingUser.setName("테스트유저1");
@@ -88,7 +88,7 @@ class AuthServiceTest {
 
         authService.signup(existingUser);
 
-        UserSignupReqDto duplicateEmailUser = new UserSignupReqDto();
+        SignupReqDto duplicateEmailUser = new SignupReqDto();
         duplicateEmailUser.setEmail("test@gmail.com");
         duplicateEmailUser.setPassword("TestPassword1!!");
         duplicateEmailUser.setName("테스트유저2");
@@ -104,21 +104,21 @@ class AuthServiceTest {
     @DisplayName("로그인 성공")
     void loginSuccess() {
         // Given : 유효한 로그인 데이터 준비
-        UserLoginReqDto userLoginReqDto = new UserLoginReqDto();
+        LoginReqDto loginReqDto = new LoginReqDto();
 
-        userLoginReqDto.setEmail("test1@gmail.com");
-        userLoginReqDto.setPassword("TestPassword1!!");
+        loginReqDto.setEmail("test1@gmail.com");
+        loginReqDto.setPassword("TestPassword1!!");
 
         // When : 로그인 실행
-        UserLoginResDto userLoginResDto = authService.login(userLoginReqDto);
+        LoginResDto loginResDto = authService.login(loginReqDto);
 
         // Then : 사용자가 DB에 저장된는지 확인
-        assertThat(jwtUtil.isExpired(userLoginResDto.getAccessToken())).isFalse();
-        assertThat(jwtUtil.isExpired(userLoginResDto.getRefreshToken())).isFalse();
+        assertThat(jwtUtil.isExpired(loginResDto.getAccessToken())).isFalse();
+        assertThat(jwtUtil.isExpired(loginResDto.getRefreshToken())).isFalse();
 
-        User findUser = userRepository.findByEmail(userLoginReqDto.getEmail()).orElse(null);
-        assertThat(jwtUtil.getId(userLoginResDto.getAccessToken())).isEqualTo(findUser.getId());
-        assertThat(Role.valueOf(jwtUtil.getRole(userLoginResDto.getAccessToken()))).isEqualTo(findUser.getRole());
+        User findUser = userRepository.findByEmail(loginReqDto.getEmail()).orElse(null);
+        assertThat(jwtUtil.getId(loginResDto.getAccessToken())).isEqualTo(findUser.getId());
+        assertThat(Role.valueOf(jwtUtil.getRole(loginResDto.getAccessToken()))).isEqualTo(findUser.getRole());
         assertThat(findUser.getRefreshToken()).isNotNull();
     }
 
@@ -126,13 +126,13 @@ class AuthServiceTest {
     @DisplayName("로그인 실패 - 존재하지 않는 이메일로 예외 발생")
     void loginFailDueToInvalidEmail() {
         // Given : 유효한 로그인 데이터 준비
-        UserLoginReqDto userLoginReqDto = new UserLoginReqDto();
+        LoginReqDto loginReqDto = new LoginReqDto();
 
-        userLoginReqDto.setEmail("nonexitent@gmail.com");
-        userLoginReqDto.setPassword("TestPassword1!!");
+        loginReqDto.setEmail("nonexitent@gmail.com");
+        loginReqDto.setPassword("TestPassword1!!");
 
         // When & Then: 로그인 실패 -  존재하지 않는 이메일로 예외 발생
-        EmailNotFoundException emailNotFoundException = assertThrows(EmailNotFoundException.class, () -> authService.login(userLoginReqDto));
+        EmailNotFoundException emailNotFoundException = assertThrows(EmailNotFoundException.class, () -> authService.login(loginReqDto));
         assertThat(emailNotFoundException.getMessage()).isEqualTo("이메일이 존재하지 않습니다.");
     }
 
@@ -140,13 +140,13 @@ class AuthServiceTest {
     @DisplayName("로그인 실패 - 잘못된 비밀번호로로 예외 발생")
     void loginFailDueToInvalidPassword() {
         // Given : 유효한 로그인 데이터 준비
-        UserLoginReqDto userLoginReqDto = new UserLoginReqDto();
+        LoginReqDto loginReqDto = new LoginReqDto();
 
-        userLoginReqDto.setEmail("test1@gmail.com");
-        userLoginReqDto.setPassword("wrongPassword1!!");
+        loginReqDto.setEmail("test1@gmail.com");
+        loginReqDto.setPassword("wrongPassword1!!");
 
         // When & Then: 로그인 실패 -  존재하지 않는 이메일로 예외 발생
-        InvalidPasswordException invalidPasswordException = assertThrows(InvalidPasswordException.class, () -> authService.login(userLoginReqDto));
+        InvalidPasswordException invalidPasswordException = assertThrows(InvalidPasswordException.class, () -> authService.login(loginReqDto));
         assertThat(invalidPasswordException.getMessage()).isEqualTo("비밀번호가 일치하지 않습니다.");
     }
 
@@ -178,12 +178,12 @@ class AuthServiceTest {
     @DisplayName("access token 재생성 성공")
     void refreshSuccess() {
         // given
-        UserLoginReqDto userLoginReqDto = new UserLoginReqDto();
-        userLoginReqDto.setEmail("test1@gmail.com");
-        userLoginReqDto.setPassword("TestPassword1!!");
-        UserLoginResDto userLoginResDto = authService.login(userLoginReqDto);
+        LoginReqDto loginReqDto = new LoginReqDto();
+        loginReqDto.setEmail("test1@gmail.com");
+        loginReqDto.setPassword("TestPassword1!!");
+        LoginResDto loginResDto = authService.login(loginReqDto);
 
-        String refreshToken = userLoginResDto.getRefreshToken();
+        String refreshToken = loginResDto.getRefreshToken();
 
         // when
         String accessToken = authService.refresh(refreshToken);

@@ -2,11 +2,14 @@ package com.myproject.petcare.pet_diary.user.controller;
 
 import com.myproject.petcare.pet_diary.common.dto.ResponseDto;
 import com.myproject.petcare.pet_diary.jwt.CustomUserDetails;
+import com.myproject.petcare.pet_diary.user.dto.UpdateUserReqDto;
+import com.myproject.petcare.pet_diary.user.dto.UserInfoResDto;
 import com.myproject.petcare.pet_diary.user.service.UserService;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -19,6 +22,16 @@ public class UserController {
     @GetMapping("/user/test")
     public String test() {
         return "ok";
+    }
+
+    @PutMapping("/user")
+    public ResponseDto<UserInfoResDto> updateUser(
+            @RequestBody @Validated UpdateUserReqDto updateUserReqDto,
+            @AuthenticationPrincipal CustomUserDetails userDetails) {
+
+        UserInfoResDto userInfoResDto = userService.updateUser(updateUserReqDto, userDetails);
+
+        return new ResponseDto<>(true, "회원 정보 수정 성공", userInfoResDto);
     }
 
 

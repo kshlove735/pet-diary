@@ -1,8 +1,8 @@
 package com.myproject.petcare.pet_diary.auth.controller;
 
-import com.myproject.petcare.pet_diary.auth.dto.UserLoginReqDto;
-import com.myproject.petcare.pet_diary.auth.dto.UserLoginResDto;
-import com.myproject.petcare.pet_diary.auth.dto.UserSignupReqDto;
+import com.myproject.petcare.pet_diary.auth.dto.LoginReqDto;
+import com.myproject.petcare.pet_diary.auth.dto.LoginResDto;
+import com.myproject.petcare.pet_diary.auth.dto.SignupReqDto;
 import com.myproject.petcare.pet_diary.auth.service.AuthService;
 import com.myproject.petcare.pet_diary.common.dto.ResponseDto;
 import com.myproject.petcare.pet_diary.jwt.JwtUtil;
@@ -27,16 +27,16 @@ public class AuthController {
     //private Long refreshTokenExpTime;
 
     @PostMapping("/auth/signup")
-    public ResponseDto signup(@RequestBody @Validated UserSignupReqDto userSignupReqDto) {
-        authService.signup(userSignupReqDto);
+    public ResponseDto signup(@RequestBody @Validated SignupReqDto signupReqDto) {
+        authService.signup(signupReqDto);
         return new ResponseDto<>(true, "회원 가입 성공", null);
     }
 
     @PostMapping("/auth/login")
-    public ResponseDto<UserLoginResDto> login(@RequestBody @Validated UserLoginReqDto userLoginReqDto, HttpServletResponse response) {
-        UserLoginResDto userLoginResDto = authService.login(userLoginReqDto);
-        response.addCookie(createCookie("access", userLoginResDto.getAccessToken(), jwtUtil.getAccessTokenExpTime().intValue()/1000));
-        response.addCookie(createCookie("refresh", userLoginResDto.getRefreshToken(), jwtUtil.getRefreshTokenExpTime().intValue()/1000));
+    public ResponseDto<LoginResDto> login(@RequestBody @Validated LoginReqDto loginReqDto, HttpServletResponse response) {
+        LoginResDto loginResDto = authService.login(loginReqDto);
+        response.addCookie(createCookie("access", loginResDto.getAccessToken(), jwtUtil.getAccessTokenExpTime().intValue()/1000));
+        response.addCookie(createCookie("refresh", loginResDto.getRefreshToken(), jwtUtil.getRefreshTokenExpTime().intValue()/1000));
 
         return new ResponseDto<>(true, "로그인 성공", null);
     }

@@ -10,7 +10,7 @@ import lombok.ToString;
 @Getter
 @Setter
 @ToString
-public class UserSignupReqDto {
+public class SignupReqDto {
 
     @NotBlank
     @Email
@@ -22,7 +22,8 @@ public class UserSignupReqDto {
     private String password;
 
     @NotBlank
-    @Pattern(regexp = "^[ㄱ-ㅎ가-힣a-z0-9-_]{2,10}$", message = "이름은 특수문자를 제외한 2~10자리여야 합니다.") // TODO : message 처리
+    @Pattern(regexp = "^[ㄱ-ㅎ가-힣a-z0-9-_]{2,10}$",
+            message = "이름은 특수문자를 제외한 2~10자리여야 합니다.") // TODO : message 처리
     private String name;
 
     @NotBlank
