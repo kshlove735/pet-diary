@@ -173,4 +173,40 @@ class AuthServiceTest {
         assertThat(jwtUtil.isExpired(accessToken)).isFalse();
         assertThat(jwtUtil.isExpired(refreshToken)).isFalse();
     }
+
+    @Test
+    @DisplayName("access token 재생성 성공")
+    void refreshSuccess() {
+        // given
+        UserLoginReqDto userLoginReqDto = new UserLoginReqDto();
+        userLoginReqDto.setEmail("test1@gmail.com");
+        userLoginReqDto.setPassword("TestPassword1!!");
+        UserLoginResDto userLoginResDto = authService.login(userLoginReqDto);
+
+        String refreshToken = userLoginResDto.getRefreshToken();
+
+        // when
+        String accessToken = authService.refresh(refreshToken);
+
+        // then
+        assertThat(jwtUtil.isExpired(accessToken)).isFalse();
+    }
+
+    @Test
+    @DisplayName("access token 재생성 실패")
+    void refreshFail() {
+        // given
+        String nullToken = null;
+        String expiredToken = "eyJhbGciOiJIUzI1NiJ9.eyJpZCI6MSwicm9sZSI6IlVTRVIiLCJpYXQiOjE3NDI0MzI3NTcsImV4cCI6MTc0MjQzNDU1N30.ErXJo0HzaSWnV-tNMxPx0f2ys2QEJy4bfu2l6UARqW4";
+        String wrongToken = "eyJhbGciOiJSUzI1NiIsInR5cCIgOiAiSldUIiwia2lkIiA6ICJPVXFpTklBSnZCdXVLRnVicFJJbUN0TjFROXZwQkxTYTNxczhvMWpTelNNIn0.eyJleHAiOjE3NTAyNDIyMTAsImlhdCI6MTc0MjQ2NjIxMCwianRpIjoiMTA2Y2UzZmQtOTVjZS00YzQ0LWJhNDktYjU2ZDYzZTJhNmNhIiwiaXNzIjoiaHR0cHM6Ly93d3cuZmFybWluc2YuY29tL2F1dGgvcmVhbG1zL2Zhcm1pbiIsImF1ZCI6ImFjY291bnQiLCJzdWIiOiI3ZTZiNzJkYy0yMTcyLTQ5NzctOTY3ZC1lYTMyMGQ4NTk5MWYiLCJ0eXAiOiJCZWFyZXIiLCJhenAiOiJmYXJtaW4iLCJzaWQiOiJiZDQ1MzE1Yy03MDNmLTQ1MmEtODJjZS1lMDdjNWQ4OTA1NmYiLCJhY3IiOiIxIiwiYWxsb3dlZC1vcmlnaW5zIjpbImh0dHA6Ly8xMTUuMjEuNzIuMjQ4OjE2NjAwLyoiLCJodHRwczovL2lmYWN0b3J5ZmFybS5mYXJtaW5zZi5jb20vKiIsIioiLCJodHRwczovL3d3dy5mYXJtaW5zZi5jb20vYXV0aC8qIiwiLyoiLCJodHRwczovL3d3dy5mYXJtaW5zZi5jb20vKiJdLCJyZWFsbV9hY2Nlc3MiOnsicm9sZXMiOlsiUk9MRV9GQVJNRVIiLCJvZmZsaW5lX2FjY2VzcyIsIlJPTEVfQURNSU4iLCJ1bWFfYXV0aG9yaXphdGlvbiIsImRlZmF1bHQtcm9sZXMtZmFybWluIl19LCJyZXNvdXJjZV9hY2Nlc3MiOnsiYWNjb3VudCI6eyJyb2xlcyI6WyJtYW5hZ2UtYWNjb3VudCIsIm1hbmFnZS1hY2NvdW50LWxpbmtzIiwidmlldy1wcm9maWxlIl19fSwic2NvcGUiOiJvcGVuaWQgZW1haWwgcHJvZmlsZSIsImVtYWlsX3ZlcmlmaWVkIjpmYWxzZSwibmFtZSI6IuyEnOyasOyXoOyXkOyKpCDshJzsmrDsl6Dsl5DsiqQiLCJwcmVmZXJyZWRfdXNlcm5hbWUiOiJzdWh3b29tczEiLCJnaXZlbl9uYW1lIjoi7ISc7Jqw7Jeg7JeQ7IqkIiwiZmFtaWx5X25hbWUiOiLshJzsmrDsl6Dsl5DsiqQifQ.Ikf2XpIhFRcj4fQWhsj49dCtQPJnCMSoak-ImsP1MroQCGNo4nbtD0AK_mZWeIFoVyH1pjfzZuJFiM2f1cxfWPrHctXBI-tajyA8TNfzmEyfQf9bckq5lcpYEp6VtU9oqtOMORCQ2jfwJ8MhX5ahhTNEtV59zxyrx-_2OY9qwG7pGKWXUisSOhDe3SVQlglQaB06N-OMq0ntfapgZHftzu9ZMTEEIGBihCZm-ZkBjuRZugRF503JoDpGHc9XMZu_YQt0MhfxCikDDeZE0-XWTLyYQXVOdFJ9EY4TWhXINTPIFbrBe7xpxePTQlp5kOTCAF1PLs9B28y7yV6MUcq-9g";
+
+        String notLoginRefreshToken = jwtUtil.createRefreshToken(1L);
+
+
+        // when & then
+        assertThrows(TokenNotFoundException.class, () -> authService.refresh(nullToken));
+        assertThrows(ExpiredTokenException.class, () -> authService.refresh(expiredToken));
+        assertThrows(InvalidTokenException.class, () -> authService.refresh(wrongToken));
+        assertThrows(NotFoundException.class, () -> authService.refresh(notLoginRefreshToken));
+    }
 }

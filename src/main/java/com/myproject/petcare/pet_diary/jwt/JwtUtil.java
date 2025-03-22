@@ -5,6 +5,7 @@ import com.myproject.petcare.pet_diary.common.exception.custom_exception.Invalid
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
+import lombok.Getter;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
@@ -13,6 +14,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.Date;
 
 @Component
+@Getter
 public class JwtUtil {
 
     private final SecretKeySpec secretKey;

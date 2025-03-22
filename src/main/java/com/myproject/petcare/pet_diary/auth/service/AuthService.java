@@ -3,9 +3,7 @@ package com.myproject.petcare.pet_diary.auth.service;
 import com.myproject.petcare.pet_diary.auth.dto.UserLoginReqDto;
 import com.myproject.petcare.pet_diary.auth.dto.UserLoginResDto;
 import com.myproject.petcare.pet_diary.auth.dto.UserSignupReqDto;
-import com.myproject.petcare.pet_diary.common.exception.custom_exception.EmailDuplicationException;
-import com.myproject.petcare.pet_diary.common.exception.custom_exception.EmailNotFoundException;
-import com.myproject.petcare.pet_diary.common.exception.custom_exception.InvalidPasswordException;
+import com.myproject.petcare.pet_diary.common.exception.custom_exception.*;
 import com.myproject.petcare.pet_diary.jwt.JwtUtil;
 import com.myproject.petcare.pet_diary.user.entity.User;
 import com.myproject.petcare.pet_diary.user.enums.Role;
@@ -67,5 +65,28 @@ public class AuthService {
 
         // return JWT 토큰
         return new UserLoginResDto(accessToken, refreshToken);
+    }
+
+    @Transactional
+    public String refresh(String refreshToken) {
+        if (refreshToken == null) {
+            throw new TokenNotFoundException("refresh token이 없습니다.");
+        }
+
+        if (jwtUtil.isExpired(refreshToken)) {
+            throw new ExpiredTokenException("refresh token이 만료되었습니다.");
+        }
+
+        Long id = jwtUtil.getId(refreshToken);
+        User user = userRepository.findById(id).orElse(null);
+
+        if (user == null || user.getRefreshToken() == null || !user.getRefreshToken().equals(refreshToken)) {
+            throw new NotFoundException("DB에 저장된 refresh token이 없거나 유효하지 않습니다.");
+        }
+
+        String accessToken = jwtUtil.createAccessToken(id, String.valueOf(user.getRole()));
+        user.setRefreshToken(accessToken);
+
+        return accessToken;
     }
 }
