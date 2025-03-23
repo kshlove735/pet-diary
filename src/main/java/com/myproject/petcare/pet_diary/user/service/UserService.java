@@ -22,15 +22,20 @@ public class UserService {
     private final UserRepository userRepository;
     private final BCryptPasswordEncoder bCryptPasswordEncoder;
 
+    public UserInfoResDto getUser(CustomUserDetails userDetails) {
+        User user = getUserFromUserDetails(userDetails);
+        return new UserInfoResDto(user.getEmail(), user.getName(), user.getPhone());
+    }
+
     @Transactional
     public void logout(CustomUserDetails userDetails) {
-        User user = getUser(userDetails);
+        User user = getUserFromUserDetails(userDetails);
         user.setRefreshToken(null);
     }
 
     @Transactional
     public UserInfoResDto updateUser(UpdateUserReqDto updateUserReqDto, CustomUserDetails userDetails) {
-        User user = getUser(userDetails);
+        User user = getUserFromUserDetails(userDetails);
 
         if (StringUtils.hasText(updateUserReqDto.getName())) {
             user.setName(updateUserReqDto.getName());
@@ -44,7 +49,7 @@ public class UserService {
     }
 
     public boolean checkPassword(CheckPasswordReqDto checkPasswordReqDto, CustomUserDetails userDetails) {
-        User user = getUser(userDetails);
+        User user = getUserFromUserDetails(userDetails);
 
         // 현재 비밀번호가 DB에 저장된 비밀번호와 같은지 확인
         if (!bCryptPasswordEncoder.matches(checkPasswordReqDto.getCurrentPassword(), user.getPassword())) {
@@ -56,7 +61,7 @@ public class UserService {
 
     @Transactional
     public void updatePassword(UpdatePasswordReqDto updatePasswordReqDto, CustomUserDetails userDetails) {
-        User user = getUser(userDetails);
+        User user = getUserFromUserDetails(userDetails);
 
         // 현재 비밀번호가 DB에 저장된 비밀번호와 같은지 확인
         if (!bCryptPasswordEncoder.matches(updatePasswordReqDto.getCurrentPassword(), user.getPassword())) {
@@ -64,14 +69,14 @@ public class UserService {
         }
 
         // 바뀔 비밀번호의 동일 입력 여부 확인
-        if(!updatePasswordReqDto.getChangedPassword().equals(updatePasswordReqDto.getChangedPasswordCheck())){
+        if (!updatePasswordReqDto.getChangedPassword().equals(updatePasswordReqDto.getChangedPasswordCheck())) {
             throw new InvalidPasswordException("변경될 비밀번호가 동일하지 않습니다.");
         }
 
         user.setPassword(bCryptPasswordEncoder.encode(updatePasswordReqDto.getChangedPassword()));
     }
 
-    private User getUser(CustomUserDetails userDetails) {
+    private User getUserFromUserDetails(CustomUserDetails userDetails) {
         Long id = Long.valueOf(userDetails.getUsername());
         User user = userRepository.findById(id).orElse(null);
         return user;

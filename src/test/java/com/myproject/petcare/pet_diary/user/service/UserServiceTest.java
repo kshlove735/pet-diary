@@ -60,6 +60,28 @@ class UserServiceTest {
     }
 
     @Test
+    @DisplayName("회원 정보 조회 성공")
+    void getUserSuccess() {
+        // given
+        // 로그인 && 회원 정보 데이터 준비
+        LoginReqDto loginReqDto = new LoginReqDto();
+        loginReqDto.setEmail("test1@gmail.com");
+        loginReqDto.setPassword("TestPassword1!!");
+        LoginResDto loginResDto = authService.login(loginReqDto);
+
+        User findUser = userRepository.findByEmail(loginReqDto.getEmail()).orElse(null);
+        CustomUserDetails customUserDetails = customUserDetailsService.loadUserByUsername(findUser.getId().toString());
+
+        // when
+        UserInfoResDto userInfoResDto = userService.getUser(customUserDetails);
+
+        // then
+        assertThat(userInfoResDto.getName()).isEqualTo(findUser.getName());
+        assertThat(userInfoResDto.getPhone()).isEqualTo(findUser.getPhone());
+        assertThat(userInfoResDto.getEmail()).isEqualTo(findUser.getEmail());
+    }
+
+    @Test
     @DisplayName("로그아웃 성공")
     void logoutSuccess() {
         // given

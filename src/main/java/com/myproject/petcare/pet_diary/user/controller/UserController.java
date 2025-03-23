@@ -21,9 +21,10 @@ public class UserController {
 
     private final UserService userService;
 
-    @GetMapping("/user/test")
-    public String test() {
-        return "ok";
+    @GetMapping("/user")
+    public ResponseDto<UserInfoResDto> getUser(@AuthenticationPrincipal CustomUserDetails userDetails) {
+        UserInfoResDto userInfoResDto = userService.getUser(userDetails);
+        return new ResponseDto<>(true, "회원 정보 조회 성공", userInfoResDto);
     }
 
     @PutMapping("/user")
