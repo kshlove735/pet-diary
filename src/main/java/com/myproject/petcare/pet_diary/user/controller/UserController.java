@@ -22,17 +22,17 @@ public class UserController {
     private final UserService userService;
 
     @GetMapping("/user")
-    public ResponseDto<UserInfoResDto> getUser(@AuthenticationPrincipal CustomUserDetails userDetails) {
-        UserInfoResDto userInfoResDto = userService.getUser(userDetails);
+    public ResponseDto<UserInfoResDto> getUser(@AuthenticationPrincipal CustomUserDetails customUserDetails) {
+        UserInfoResDto userInfoResDto = userService.getUser(customUserDetails);
         return new ResponseDto<>(true, "회원 정보 조회 성공", userInfoResDto);
     }
 
     @PutMapping("/user")
     public ResponseDto<UserInfoResDto> updateUser(
             @RequestBody @Validated UpdateUserReqDto updateUserReqDto,
-            @AuthenticationPrincipal CustomUserDetails userDetails) {
+            @AuthenticationPrincipal CustomUserDetails customUserDetails) {
 
-        UserInfoResDto userInfoResDto = userService.updateUser(updateUserReqDto, userDetails);
+        UserInfoResDto userInfoResDto = userService.updateUser(updateUserReqDto, customUserDetails);
 
         return new ResponseDto<>(true, "회원 정보 수정 성공", userInfoResDto);
     }
@@ -40,9 +40,9 @@ public class UserController {
     @GetMapping("/user/password")
     public ResponseDto checkPassword(
             @RequestBody @Validated CheckPasswordReqDto checkPasswordReqDto,
-            @AuthenticationPrincipal CustomUserDetails userDetails) {
+            @AuthenticationPrincipal CustomUserDetails customUserDetails) {
 
-        boolean isPasswordEqual = userService.checkPassword(checkPasswordReqDto, userDetails);
+        boolean isPasswordEqual = userService.checkPassword(checkPasswordReqDto, customUserDetails);
 
         return new ResponseDto<>(true, "현재 비밀번호와 동일합니다.", null);
 
@@ -51,19 +51,19 @@ public class UserController {
     @PutMapping("/user/password")
     public ResponseDto updatePassword(
             @RequestBody @Validated UpdatePasswordReqDto updatePasswordReqDto,
-            @AuthenticationPrincipal CustomUserDetails userDetails) {
+            @AuthenticationPrincipal CustomUserDetails customUserDetails) {
 
-        userService.updatePassword(updatePasswordReqDto, userDetails);
+        userService.updatePassword(updatePasswordReqDto, customUserDetails);
 
         return new ResponseDto<>(true, "비밀번호 수정 성공", null);
     }
 
     @PatchMapping("/user/logout")
     public ResponseDto logout(
-            @AuthenticationPrincipal CustomUserDetails userDetails,
+            @AuthenticationPrincipal CustomUserDetails customUserDetails,
             HttpServletResponse response) {
 
-        userService.logout(userDetails);
+        userService.logout(customUserDetails);
 
         Cookie deleteAccessCookie = deleteCookie("access");
         Cookie deleteRefreshCookie = deleteCookie("refresh");
@@ -73,9 +73,9 @@ public class UserController {
     }
 
     @DeleteMapping("/user")
-    public ResponseDto deleteUser(@AuthenticationPrincipal CustomUserDetails userDetails) {
+    public ResponseDto deleteUser(@AuthenticationPrincipal CustomUserDetails customUserDetails) {
 
-        userService.deleteUser(userDetails);
+        userService.deleteUser(customUserDetails);
 
         return new ResponseDto<>(true, "회원 탈퇴 성공", null);
     }

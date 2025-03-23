@@ -22,20 +22,20 @@ public class UserService {
     private final UserRepository userRepository;
     private final BCryptPasswordEncoder bCryptPasswordEncoder;
 
-    public UserInfoResDto getUser(CustomUserDetails userDetails) {
-        User user = getUserFromUserDetails(userDetails);
+    public UserInfoResDto getUser(CustomUserDetails customUserDetails) {
+        User user = getUserFromUserDetails(customUserDetails);
         return new UserInfoResDto(user.getEmail(), user.getName(), user.getPhone());
     }
 
     @Transactional
-    public void logout(CustomUserDetails userDetails) {
-        User user = getUserFromUserDetails(userDetails);
+    public void logout(CustomUserDetails customUserDetails) {
+        User user = getUserFromUserDetails(customUserDetails);
         user.setRefreshToken(null);
     }
 
     @Transactional
-    public UserInfoResDto updateUser(UpdateUserReqDto updateUserReqDto, CustomUserDetails userDetails) {
-        User user = getUserFromUserDetails(userDetails);
+    public UserInfoResDto updateUser(UpdateUserReqDto updateUserReqDto, CustomUserDetails customUserDetails) {
+        User user = getUserFromUserDetails(customUserDetails);
 
         if (StringUtils.hasText(updateUserReqDto.getName())) {
             user.setName(updateUserReqDto.getName());
@@ -48,8 +48,8 @@ public class UserService {
         return new UserInfoResDto(user.getEmail(), user.getName(), user.getPhone());
     }
 
-    public boolean checkPassword(CheckPasswordReqDto checkPasswordReqDto, CustomUserDetails userDetails) {
-        User user = getUserFromUserDetails(userDetails);
+    public boolean checkPassword(CheckPasswordReqDto checkPasswordReqDto, CustomUserDetails customUserDetails) {
+        User user = getUserFromUserDetails(customUserDetails);
 
         // 현재 비밀번호가 DB에 저장된 비밀번호와 같은지 확인
         if (!bCryptPasswordEncoder.matches(checkPasswordReqDto.getCurrentPassword(), user.getPassword())) {
@@ -60,8 +60,8 @@ public class UserService {
     }
 
     @Transactional
-    public void updatePassword(UpdatePasswordReqDto updatePasswordReqDto, CustomUserDetails userDetails) {
-        User user = getUserFromUserDetails(userDetails);
+    public void updatePassword(UpdatePasswordReqDto updatePasswordReqDto, CustomUserDetails customUserDetails) {
+        User user = getUserFromUserDetails(customUserDetails);
 
         // 현재 비밀번호가 DB에 저장된 비밀번호와 같은지 확인
         if (!bCryptPasswordEncoder.matches(updatePasswordReqDto.getCurrentPassword(), user.getPassword())) {
@@ -77,13 +77,13 @@ public class UserService {
     }
 
     @Transactional
-    public void deleteUser(CustomUserDetails userDetails) {
-        User user = getUserFromUserDetails(userDetails);
+    public void deleteUser(CustomUserDetails customUserDetails) {
+        User user = getUserFromUserDetails(customUserDetails);
         userRepository.delete(user);
     }
 
-    private User getUserFromUserDetails(CustomUserDetails userDetails) {
-        Long id = Long.valueOf(userDetails.getUsername());
+    private User getUserFromUserDetails(CustomUserDetails customUserDetails) {
+        Long id = Long.valueOf(customUserDetails.getUsername());
         User user = userRepository.findById(id).orElse(null);
         return user;
     }
