@@ -72,6 +72,14 @@ public class UserController {
         return new ResponseDto<>(true, "로그아웃 성공", null);
     }
 
+    @DeleteMapping("/user")
+    public ResponseDto deleteUser(@AuthenticationPrincipal CustomUserDetails userDetails) {
+
+        userService.deleteUser(userDetails);
+
+        return new ResponseDto<>(true, "회원 탈퇴 성공", null);
+    }
+
     private Cookie deleteCookie(String key) {
         Cookie cookie = new Cookie(key, null);
         cookie.setPath("/");

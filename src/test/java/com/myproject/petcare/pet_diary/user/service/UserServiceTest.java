@@ -232,4 +232,24 @@ class UserServiceTest {
         InvalidPasswordException invalidPasswordException = assertThrows(InvalidPasswordException.class, () -> userService.updatePassword(updatePasswordReqDto, customUserDetails));
         assertThat(invalidPasswordException.getMessage()).isEqualTo("변경될 비밀번호가 동일하지 않습니다.");
     }
+
+    @Test
+    @DisplayName("회원 탈퇴 성공")
+    void deleteUserSuccess() {
+        // given
+        // 로그인 && 회원 정보 데이터 준비
+        LoginReqDto loginReqDto = new LoginReqDto();
+        loginReqDto.setEmail("test1@gmail.com");
+        loginReqDto.setPassword("TestPassword1!!");
+        LoginResDto loginResDto = authService.login(loginReqDto);
+
+        User findUser = userRepository.findByEmail(loginReqDto.getEmail()).orElse(null);
+        CustomUserDetails customUserDetails = customUserDetailsService.loadUserByUsername(findUser.getId().toString());
+
+        // when
+        userService.deleteUser(customUserDetails);
+
+        // then
+        assertThat(userRepository.findByEmail(loginReqDto.getEmail()).orElse(null)).isNull();
+    }
 }

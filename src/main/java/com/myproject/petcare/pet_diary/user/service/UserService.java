@@ -76,6 +76,12 @@ public class UserService {
         user.setPassword(bCryptPasswordEncoder.encode(updatePasswordReqDto.getChangedPassword()));
     }
 
+    @Transactional
+    public void deleteUser(CustomUserDetails userDetails) {
+        User user = getUserFromUserDetails(userDetails);
+        userRepository.delete(user);
+    }
+
     private User getUserFromUserDetails(CustomUserDetails userDetails) {
         Long id = Long.valueOf(userDetails.getUsername());
         User user = userRepository.findById(id).orElse(null);
