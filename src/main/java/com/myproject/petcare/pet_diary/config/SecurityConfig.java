@@ -43,7 +43,7 @@ public class SecurityConfig {
 
         // 경로별 인가 작업
         http.authorizeHttpRequests((auth) -> auth
-                .requestMatchers("/", "/v1/auth/**").permitAll()
+                .requestMatchers("/", "/api/v1/auth/**").permitAll()
                 .anyRequest().authenticated());
 
         // 세션 설정 : JWT를 통한 인증/ 인가를 위해서 세션을 STATELESS 상태로 설정

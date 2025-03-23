@@ -24,7 +24,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     private final CustomUserDetailsService customUserDetailsService;
 
     // 인가가 필요없는 경로 설정 할 경우
-    private final List<String> excludedPatterns = Arrays.asList("/", "/v1/auth/**");
+    private final List<String> excludedPatterns = Arrays.asList("/", "/api/v1/auth/**");
     private final AntPathMatcher pathMatcher = new AntPathMatcher();
 
     public JwtAuthenticationFilter(JwtUtil jwtUtil, CustomUserDetailsService customUserDetailsService) {

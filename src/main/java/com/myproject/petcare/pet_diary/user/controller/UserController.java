@@ -2,6 +2,8 @@ package com.myproject.petcare.pet_diary.user.controller;
 
 import com.myproject.petcare.pet_diary.common.dto.ResponseDto;
 import com.myproject.petcare.pet_diary.jwt.CustomUserDetails;
+import com.myproject.petcare.pet_diary.user.dto.CheckPasswordReqDto;
+import com.myproject.petcare.pet_diary.user.dto.UpdatePasswordReqDto;
 import com.myproject.petcare.pet_diary.user.dto.UpdateUserReqDto;
 import com.myproject.petcare.pet_diary.user.dto.UserInfoResDto;
 import com.myproject.petcare.pet_diary.user.service.UserService;
@@ -13,7 +15,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/v1")
+@RequestMapping("/api/v1")
 @RequiredArgsConstructor
 public class UserController {
 
@@ -34,6 +36,26 @@ public class UserController {
         return new ResponseDto<>(true, "회원 정보 수정 성공", userInfoResDto);
     }
 
+    @GetMapping("/user/password")
+    public ResponseDto checkPassword(
+            @RequestBody @Validated CheckPasswordReqDto checkPasswordReqDto,
+            @AuthenticationPrincipal CustomUserDetails userDetails) {
+
+        boolean isPasswordEqual = userService.checkPassword(checkPasswordReqDto, userDetails);
+
+        return new ResponseDto<>(true, "현재 비밀번호와 동일합니다.", null);
+
+    }
+
+    @PutMapping("/user/password")
+    public ResponseDto updatePassword(
+            @RequestBody @Validated UpdatePasswordReqDto updatePasswordReqDto,
+            @AuthenticationPrincipal CustomUserDetails userDetails) {
+
+        userService.updatePassword(updatePasswordReqDto, userDetails);
+
+        return new ResponseDto<>(true, "비밀번호 수정 성공", null);
+    }
 
     @PatchMapping("/user/logout")
     public ResponseDto logout(

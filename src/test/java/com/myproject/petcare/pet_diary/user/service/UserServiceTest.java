@@ -3,8 +3,11 @@ package com.myproject.petcare.pet_diary.user.service;
 import com.myproject.petcare.pet_diary.auth.dto.LoginReqDto;
 import com.myproject.petcare.pet_diary.auth.dto.LoginResDto;
 import com.myproject.petcare.pet_diary.auth.service.AuthService;
+import com.myproject.petcare.pet_diary.common.exception.custom_exception.InvalidPasswordException;
 import com.myproject.petcare.pet_diary.jwt.CustomUserDetails;
 import com.myproject.petcare.pet_diary.jwt.CustomUserDetailsService;
+import com.myproject.petcare.pet_diary.user.dto.CheckPasswordReqDto;
+import com.myproject.petcare.pet_diary.user.dto.UpdatePasswordReqDto;
 import com.myproject.petcare.pet_diary.user.dto.UpdateUserReqDto;
 import com.myproject.petcare.pet_diary.user.dto.UserInfoResDto;
 import com.myproject.petcare.pet_diary.user.entity.User;
@@ -20,6 +23,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.transaction.annotation.Transactional;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @SpringBootTest
 @Transactional
@@ -59,13 +63,12 @@ class UserServiceTest {
     @DisplayName("로그아웃 성공")
     void logoutSuccess() {
         // given
-        // 로그인
+        // 로그인 && 회원 정보 데이터 준비
         LoginReqDto loginReqDto = new LoginReqDto();
         loginReqDto.setEmail("test1@gmail.com");
         loginReqDto.setPassword("TestPassword1!!");
         LoginResDto loginResDto = authService.login(loginReqDto);
 
-        // 로그아웃 데이터 준비
         User findUser = userRepository.findByEmail(loginReqDto.getEmail()).orElse(null);
         CustomUserDetails customUserDetails = customUserDetailsService.loadUserByUsername(findUser.getId().toString());
 
@@ -81,13 +84,12 @@ class UserServiceTest {
     @DisplayName("회원 정보 수정 성공")
     void updateUserSuccess() {
         // given
-        // 로그인
+        // 로그인 && 회원 정보 데이터 준비
         LoginReqDto loginReqDto = new LoginReqDto();
         loginReqDto.setEmail("test1@gmail.com");
         loginReqDto.setPassword("TestPassword1!!");
         LoginResDto loginResDto = authService.login(loginReqDto);
 
-        // 회원 정보 데이터 준비
         User findUser = userRepository.findByEmail(loginReqDto.getEmail()).orElse(null);
         CustomUserDetails customUserDetails = customUserDetailsService.loadUserByUsername(findUser.getId().toString());
 
@@ -104,5 +106,108 @@ class UserServiceTest {
         assertThat(userInfoResDto.getPhone()).isEqualTo(updateUserReqDto.getPhone());
 
         assertThat(userInfoResDto.getEmail()).isEqualTo(findUser.getEmail());
+    }
+
+    @Test
+    @DisplayName("비밀번호 동일 여부 확인 성공")
+    void checkPasswordSuccess() {
+        // given
+        // 로그인 && 회원 정보 데이터 준비
+        LoginReqDto loginReqDto = new LoginReqDto();
+        loginReqDto.setEmail("test1@gmail.com");
+        loginReqDto.setPassword("TestPassword1!!");
+        LoginResDto loginResDto = authService.login(loginReqDto);
+
+        User findUser = userRepository.findByEmail(loginReqDto.getEmail()).orElse(null);
+        CustomUserDetails customUserDetails = customUserDetailsService.loadUserByUsername(findUser.getId().toString());
+
+        // 비밀번호 동일 여부 확인 데이터 준비
+        CheckPasswordReqDto checkPasswordReqDto = new CheckPasswordReqDto();
+        checkPasswordReqDto.setCurrentPassword(loginReqDto.getPassword());
+
+        // when
+        boolean isPasswordEqual = userService.checkPassword(checkPasswordReqDto, customUserDetails);
+
+        // then
+        assertThat(isPasswordEqual).isTrue();
+    }
+
+    @Test
+    @DisplayName("비밀번호 동일 여부 확인 실패")
+    void checkPasswordFail() {
+        // given
+        // 로그인 && 회원 정보 데이터 준비
+        LoginReqDto loginReqDto = new LoginReqDto();
+        loginReqDto.setEmail("test1@gmail.com");
+        loginReqDto.setPassword("TestPassword1!!");
+        LoginResDto loginResDto = authService.login(loginReqDto);
+
+        User findUser = userRepository.findByEmail(loginReqDto.getEmail()).orElse(null);
+        CustomUserDetails customUserDetails = customUserDetailsService.loadUserByUsername(findUser.getId().toString());
+
+        // 비밀번호 동일 여부 확인 데이터 준비
+        CheckPasswordReqDto checkPasswordReqDto = new CheckPasswordReqDto();
+        checkPasswordReqDto.setCurrentPassword("wrongPW!!");
+
+        // when && then
+        InvalidPasswordException invalidPasswordException = assertThrows(InvalidPasswordException.class, () -> userService.checkPassword(checkPasswordReqDto, customUserDetails));
+        assertThat(invalidPasswordException.getMessage()).isEqualTo("비밀번호를 다시 확인해 주세요.");
+    }
+
+    @Test
+    @DisplayName("비밀번호 변경 성공")
+    void updatePasswordSuccess() {
+        // given
+        // 로그인 && 회원 정보 데이터 준비
+        LoginReqDto loginReqDto = new LoginReqDto();
+        loginReqDto.setEmail("test1@gmail.com");
+        loginReqDto.setPassword("TestPassword1!!");
+        LoginResDto loginResDto = authService.login(loginReqDto);
+
+        User findUser = userRepository.findByEmail(loginReqDto.getEmail()).orElse(null);
+        CustomUserDetails customUserDetails = customUserDetailsService.loadUserByUsername(findUser.getId().toString());
+
+        System.out.println("findUser.getPassword() = " + findUser.getPassword());
+
+        // 비밀번호 동일 여부 확인 데이터 준비
+        UpdatePasswordReqDto updatePasswordReqDto = new UpdatePasswordReqDto();
+        updatePasswordReqDto.setCurrentPassword(loginReqDto.getPassword());
+        updatePasswordReqDto.setChangedPassword("changedPW1!!");
+        updatePasswordReqDto.setChangedPasswordCheck("changedPW1!!");
+
+        // when
+        userService.updatePassword(updatePasswordReqDto, customUserDetails);
+
+        // then
+        User passwordChangeUser = userRepository.findByEmail(loginReqDto.getEmail()).orElse(null);
+
+        System.out.println("passwordChangeUser.getPassword() = " + passwordChangeUser.getPassword());
+        assertThat(bCryptPasswordEncoder.matches(updatePasswordReqDto.getChangedPassword(), passwordChangeUser.getPassword())).isTrue();
+    }
+
+    @Test
+    @DisplayName("비밀번호 변경 실패")
+    void updatePasswordFail() {
+        // given
+        // 로그인 && 회원 정보 데이터 준비
+        LoginReqDto loginReqDto = new LoginReqDto();
+        loginReqDto.setEmail("test1@gmail.com");
+        loginReqDto.setPassword("TestPassword1!!");
+        LoginResDto loginResDto = authService.login(loginReqDto);
+
+        User findUser = userRepository.findByEmail(loginReqDto.getEmail()).orElse(null);
+        CustomUserDetails customUserDetails = customUserDetailsService.loadUserByUsername(findUser.getId().toString());
+
+        System.out.println("findUser.getPassword() = " + findUser.getPassword());
+
+        // 비밀번호 동일 여부 확인 데이터 준비
+        UpdatePasswordReqDto updatePasswordReqDto = new UpdatePasswordReqDto();
+        updatePasswordReqDto.setCurrentPassword(loginReqDto.getPassword());
+        updatePasswordReqDto.setChangedPassword("changedPW1!!");
+        updatePasswordReqDto.setChangedPasswordCheck("differentPW1!!");
+
+        // when && then
+        InvalidPasswordException invalidPasswordException = assertThrows(InvalidPasswordException.class, () -> userService.updatePassword(updatePasswordReqDto, customUserDetails));
+        assertThat(invalidPasswordException.getMessage()).isEqualTo("변경될 비밀번호가 동일하지 않습니다.");
     }
 }
