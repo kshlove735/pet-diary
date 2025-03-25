@@ -6,12 +6,10 @@ import com.myproject.petcare.pet_diary.pet.dto.CreatePetReqDto;
 import com.myproject.petcare.pet_diary.pet.dto.PetInfoResDto;
 import com.myproject.petcare.pet_diary.pet.service.PetService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/v1")
@@ -20,6 +18,7 @@ public class PetController {
     private final PetService petService;
 
     @PostMapping("/pet")
+    @ResponseStatus(HttpStatus.CREATED)
     public ResponseDto<PetInfoResDto> createPet(
             @RequestBody @Validated CreatePetReqDto createPetReqDto,
             @AuthenticationPrincipal CustomUserDetails customUserDetails) {
