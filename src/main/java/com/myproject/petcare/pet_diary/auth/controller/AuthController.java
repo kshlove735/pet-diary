@@ -9,6 +9,7 @@ import com.myproject.petcare.pet_diary.jwt.JwtUtil;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
@@ -27,12 +28,14 @@ public class AuthController {
     //private Long refreshTokenExpTime;
 
     @PostMapping("/auth/signup")
+    @ResponseStatus(HttpStatus.CREATED)
     public ResponseDto signup(@RequestBody @Validated SignupReqDto signupReqDto) {
         authService.signup(signupReqDto);
         return new ResponseDto<>(true, "회원 가입 성공", null);
     }
 
     @PostMapping("/auth/login")
+    @ResponseStatus(HttpStatus.CREATED)
     public ResponseDto<LoginResDto> login(@RequestBody @Validated LoginReqDto loginReqDto, HttpServletResponse response) {
         LoginResDto loginResDto = authService.login(loginReqDto);
         response.addCookie(createCookie("access", loginResDto.getAccessToken(), jwtUtil.getAccessTokenExpTime().intValue()/1000));
@@ -42,6 +45,7 @@ public class AuthController {
     }
 
     @PostMapping("/auth/refresh")
+    @ResponseStatus(HttpStatus.CREATED)
     public ResponseDto refresh(@CookieValue("refresh") String refreshToken, HttpServletResponse response){
         String accessToken = authService.refresh(refreshToken);
         response.addCookie(createCookie("access", accessToken, jwtUtil.getAccessTokenExpTime().intValue()/1000));

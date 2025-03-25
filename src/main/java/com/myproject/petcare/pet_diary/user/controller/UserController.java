@@ -10,6 +10,7 @@ import com.myproject.petcare.pet_diary.user.service.UserService;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -28,6 +29,7 @@ public class UserController {
     }
 
     @PutMapping("/user")
+    @ResponseStatus(HttpStatus.CREATED)
     public ResponseDto<UserInfoResDto> updateUser(
             @RequestBody @Validated UpdateUserReqDto updateUserReqDto,
             @AuthenticationPrincipal CustomUserDetails customUserDetails) {
@@ -58,7 +60,7 @@ public class UserController {
         return new ResponseDto<>(true, "비밀번호 수정 성공", null);
     }
 
-    @PatchMapping("/user/logout")
+    @PutMapping("/user/logout")
     public ResponseDto logout(
             @AuthenticationPrincipal CustomUserDetails customUserDetails,
             HttpServletResponse response) {
