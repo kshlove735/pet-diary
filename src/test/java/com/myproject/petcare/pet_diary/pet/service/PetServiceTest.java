@@ -2,7 +2,7 @@ package com.myproject.petcare.pet_diary.pet.service;
 
 import com.myproject.petcare.pet_diary.common.exception.custom_exception.NotFoundException;
 import com.myproject.petcare.pet_diary.jwt.CustomUserDetails;
-import com.myproject.petcare.pet_diary.pet.dto.CreatePetReqDto;
+import com.myproject.petcare.pet_diary.pet.dto.PartialPetReqDto;
 import com.myproject.petcare.pet_diary.pet.dto.PetInfoResDto;
 import com.myproject.petcare.pet_diary.pet.entity.Pet;
 import com.myproject.petcare.pet_diary.pet.enums.Gender;
@@ -84,24 +84,24 @@ class PetServiceTest {
     @DisplayName("반려견 등록 성공")
     void createPetSuccess() {
         // given
-        CreatePetReqDto createPetReqDto = new CreatePetReqDto();
-        createPetReqDto.setName("나비");
-        createPetReqDto.setBreed("푸들");
-        createPetReqDto.setBirthDate(LocalDate.parse("1989-09-14"));
-        createPetReqDto.setGender(Gender.MALE);
-        createPetReqDto.setWeight(new BigDecimal("10.23"));
-        createPetReqDto.setDescription("예민함");
+        PartialPetReqDto partialPetReqDto = new PartialPetReqDto();
+        partialPetReqDto.setName("나비");
+        partialPetReqDto.setBreed("푸들");
+        partialPetReqDto.setBirthDate(LocalDate.parse("1989-09-14"));
+        partialPetReqDto.setGender(Gender.MALE);
+        partialPetReqDto.setWeight(new BigDecimal("10.23"));
+        partialPetReqDto.setDescription("예민함");
 
         // when
-        PetInfoResDto petInfoResDto = petService.createPet(createPetReqDto, customUserDetails);
+        PetInfoResDto petInfoResDto = petService.createPet(partialPetReqDto, customUserDetails);
 
         // then
-        assertThat(petInfoResDto.getName()).isEqualTo(createPetReqDto.getName());
-        assertThat(petInfoResDto.getBreed()).isEqualTo(createPetReqDto.getBreed());
-        assertThat(petInfoResDto.getBirthDate()).isEqualTo(createPetReqDto.getBirthDate());
-        assertThat(petInfoResDto.getGender()).isEqualTo(createPetReqDto.getGender());
-        assertThat(petInfoResDto.getWeight()).isEqualTo(createPetReqDto.getWeight());
-        assertThat(petInfoResDto.getDescription()).isEqualTo(createPetReqDto.getDescription());
+        assertThat(petInfoResDto.getName()).isEqualTo(partialPetReqDto.getName());
+        assertThat(petInfoResDto.getBreed()).isEqualTo(partialPetReqDto.getBreed());
+        assertThat(petInfoResDto.getBirthDate()).isEqualTo(partialPetReqDto.getBirthDate());
+        assertThat(petInfoResDto.getGender()).isEqualTo(partialPetReqDto.getGender());
+        assertThat(petInfoResDto.getWeight()).isEqualTo(partialPetReqDto.getWeight());
+        assertThat(petInfoResDto.getDescription()).isEqualTo(partialPetReqDto.getDescription());
     }
 
     @Test
@@ -148,6 +148,30 @@ class PetServiceTest {
         assertThat(petInfoResDto.getGender()).isEqualTo(testPet1.getGender());
         assertThat(petInfoResDto.getWeight()).isEqualTo(testPet1.getWeight());
         assertThat(petInfoResDto.getDescription()).isEqualTo(testPet1.getDescription());
+    }
+
+    @Test
+    @DisplayName("반려견 정보 수정 성공")
+    void updatePetSuccess() {
+        // given
+        PartialPetReqDto partialPetReqDto = new PartialPetReqDto();
+        partialPetReqDto.setName("나비");
+        partialPetReqDto.setBreed("푸들");
+        partialPetReqDto.setBirthDate(LocalDate.parse("1989-09-14"));
+        partialPetReqDto.setGender(Gender.MALE);
+        partialPetReqDto.setWeight(new BigDecimal("10.23"));
+        partialPetReqDto.setDescription("예민함");
+
+        // when
+        PetInfoResDto petInfoResDto = petService.updatePet(testPet1.getId(), partialPetReqDto);
+
+        // then
+        assertThat(petInfoResDto.getName()).isEqualTo(partialPetReqDto.getName());
+        assertThat(petInfoResDto.getBreed()).isEqualTo(partialPetReqDto.getBreed());
+        assertThat(petInfoResDto.getBirthDate()).isEqualTo(partialPetReqDto.getBirthDate());
+        assertThat(petInfoResDto.getGender()).isEqualTo(partialPetReqDto.getGender());
+        assertThat(petInfoResDto.getWeight()).isEqualTo(partialPetReqDto.getWeight());
+        assertThat(petInfoResDto.getDescription()).isEqualTo(partialPetReqDto.getDescription());
     }
 
 }

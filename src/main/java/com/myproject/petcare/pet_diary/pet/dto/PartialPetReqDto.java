@@ -10,7 +10,7 @@ import java.time.LocalDate;
 
 @Getter
 @Setter
-public class CreatePetReqDto {
+public class PartialPetReqDto {
 
     @NotBlank(message = "이름은 필수 입력 항목입니다.")
     @Size(min = 1, max = 50, message = "이름은 1~50자 사이여야 합니다.")

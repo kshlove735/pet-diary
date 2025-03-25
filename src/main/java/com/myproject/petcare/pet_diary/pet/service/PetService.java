@@ -2,7 +2,7 @@ package com.myproject.petcare.pet_diary.pet.service;
 
 import com.myproject.petcare.pet_diary.common.exception.custom_exception.NotFoundException;
 import com.myproject.petcare.pet_diary.jwt.CustomUserDetails;
-import com.myproject.petcare.pet_diary.pet.dto.CreatePetReqDto;
+import com.myproject.petcare.pet_diary.pet.dto.PartialPetReqDto;
 import com.myproject.petcare.pet_diary.pet.dto.PetInfoResDto;
 import com.myproject.petcare.pet_diary.pet.entity.Pet;
 import com.myproject.petcare.pet_diary.pet.repository.PetRepository;
@@ -24,16 +24,16 @@ public class PetService {
     private final PetRepository petRepository;
 
     @Transactional
-    public PetInfoResDto createPet(CreatePetReqDto createPetReqDto, CustomUserDetails customUserDetails) {
+    public PetInfoResDto createPet(PartialPetReqDto partialPetReqDto, CustomUserDetails customUserDetails) {
         User user = getUserFromUserDetails(customUserDetails);
 
         Pet pet = new Pet();
-        pet.setName(createPetReqDto.getName());
-        pet.setBreed(createPetReqDto.getBreed());
-        pet.setBirthDate(createPetReqDto.getBirthDate());
-        pet.setGender(createPetReqDto.getGender());
-        pet.setWeight(createPetReqDto.getWeight());
-        pet.setDescription(createPetReqDto.getDescription());
+        pet.setName(partialPetReqDto.getName());
+        pet.setBreed(partialPetReqDto.getBreed());
+        pet.setBirthDate(partialPetReqDto.getBirthDate());
+        pet.setGender(partialPetReqDto.getGender());
+        pet.setWeight(partialPetReqDto.getWeight());
+        pet.setDescription(partialPetReqDto.getDescription());
         pet.changeUser(user);
         petRepository.save(pet);
 
@@ -56,6 +56,20 @@ public class PetService {
         return list;
     }
 
+    @Transactional
+    public PetInfoResDto updatePet(Long petId, PartialPetReqDto partialPetReqDto) {
+        Pet pet = petRepository.findById(petId).orElseThrow(() -> new NotFoundException("해당하는 유저가 없습니다."));
+
+        pet.setName(partialPetReqDto.getName());
+        pet.setBreed(partialPetReqDto.getBreed());
+        pet.setBirthDate(partialPetReqDto.getBirthDate());
+        pet.setGender(partialPetReqDto.getGender());
+        pet.setWeight(partialPetReqDto.getWeight());
+        pet.setDescription(partialPetReqDto.getDescription());
+
+        return getPetInfoResDto(pet);
+    }
+
     private User getUserFromUserDetails(CustomUserDetails customUserDetails) {
         Long id = Long.valueOf(customUserDetails.getUsername());
         User user = userRepository.findById(id).orElse(null);
@@ -67,6 +81,5 @@ public class PetService {
                 pet.getId(), pet.getName(), pet.getBreed(), pet.getBirthDate(),
                 pet.getGender(), pet.getWeight(), pet.getDescription(), pet.getCreateDate(), pet.getUpdatedDate());
     }
-
 
 }
