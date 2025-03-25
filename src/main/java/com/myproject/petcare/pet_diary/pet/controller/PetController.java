@@ -27,4 +27,12 @@ public class PetController {
 
         return new ResponseDto<>(true, "반려견 등록 성공", petInfoResDto);
     }
+
+    @GetMapping("/pet/{petId}")
+    public ResponseDto getPet(@PathVariable("petId") Long petId) {
+
+        PetInfoResDto petInfoResDto = petService.getPet(petId);
+
+        return new ResponseDto<>(true, "반려견 단일 조회", petInfoResDto);
+    }
 }

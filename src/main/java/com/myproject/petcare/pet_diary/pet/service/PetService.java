@@ -1,5 +1,6 @@
 package com.myproject.petcare.pet_diary.pet.service;
 
+import com.myproject.petcare.pet_diary.common.exception.custom_exception.NotFoundException;
 import com.myproject.petcare.pet_diary.jwt.CustomUserDetails;
 import com.myproject.petcare.pet_diary.pet.dto.CreatePetReqDto;
 import com.myproject.petcare.pet_diary.pet.dto.PetInfoResDto;
@@ -33,17 +34,23 @@ public class PetService {
         pet.changeUser(user);
         petRepository.save(pet);
 
-        PetInfoResDto petInfoResDto = new PetInfoResDto(
-                pet.getId(),pet.getName(),pet.getBreed(),pet.getBirthDate(),
-                pet.getGender(), pet.getWeight(), pet.getDescription(),pet.getCreateDate(), pet.getUpdatedDate());
-
-        return petInfoResDto;
+        return getPetInfoResDto(pet);
     }
 
+    public PetInfoResDto getPet(Long petId) {
+        Pet pet = petRepository.findById(petId).orElseThrow(() -> new NotFoundException("해당하는 유저가 없습니다."));
+        return getPetInfoResDto(pet);
+    }
 
     private User getUserFromUserDetails(CustomUserDetails customUserDetails) {
         Long id = Long.valueOf(customUserDetails.getUsername());
         User user = userRepository.findById(id).orElse(null);
         return user;
+    }
+
+    private PetInfoResDto getPetInfoResDto(Pet pet) {
+        return new PetInfoResDto(
+                pet.getId(), pet.getName(), pet.getBreed(), pet.getBirthDate(),
+                pet.getGender(), pet.getWeight(), pet.getDescription(), pet.getCreateDate(), pet.getUpdatedDate());
     }
 }
