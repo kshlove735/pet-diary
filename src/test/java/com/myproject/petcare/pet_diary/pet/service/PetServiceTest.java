@@ -127,7 +127,7 @@ class PetServiceTest {
         // given
 
         // when & then
-        assertThrows(NotFoundException.class,() -> petService.getPet(13L));
+        assertThrows(NotFoundException.class, () -> petService.getPet(13L));
     }
 
     @Test
@@ -172,6 +172,18 @@ class PetServiceTest {
         assertThat(petInfoResDto.getGender()).isEqualTo(partialPetReqDto.getGender());
         assertThat(petInfoResDto.getWeight()).isEqualTo(partialPetReqDto.getWeight());
         assertThat(petInfoResDto.getDescription()).isEqualTo(partialPetReqDto.getDescription());
+    }
+
+    @Test
+    @DisplayName("반려견 정보 삭제 성공")
+    void deletePetSuccess() {
+        // given
+
+        // when
+        petService.deletePet(testPet1.getId());
+
+        //then
+        assertThrows(NotFoundException.class, () -> petService.getPet(testPet1.getId()));
     }
 
 }

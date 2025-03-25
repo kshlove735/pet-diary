@@ -41,7 +41,7 @@ public class PetService {
     }
 
     public PetInfoResDto getPet(Long petId) {
-        Pet pet = petRepository.findById(petId).orElseThrow(() -> new NotFoundException("해당하는 유저가 없습니다."));
+        Pet pet = petRepository.findById(petId).orElseThrow(() -> new NotFoundException("해당하는 반려견이 없습니다."));
         return getPetInfoResDto(pet);
     }
 
@@ -58,7 +58,7 @@ public class PetService {
 
     @Transactional
     public PetInfoResDto updatePet(Long petId, PartialPetReqDto partialPetReqDto) {
-        Pet pet = petRepository.findById(petId).orElseThrow(() -> new NotFoundException("해당하는 유저가 없습니다."));
+        Pet pet = petRepository.findById(petId).orElseThrow(() -> new NotFoundException("해당하는 반려견이 없습니다."));
 
         pet.setName(partialPetReqDto.getName());
         pet.setBreed(partialPetReqDto.getBreed());
@@ -68,6 +68,12 @@ public class PetService {
         pet.setDescription(partialPetReqDto.getDescription());
 
         return getPetInfoResDto(pet);
+    }
+
+    @Transactional
+    public void deletePet(Long petId) {
+        Pet pet = petRepository.findById(petId).orElseThrow(() -> new NotFoundException("해당하는 반려견이 없습니다."));
+        petRepository.delete(pet);
     }
 
     private User getUserFromUserDetails(CustomUserDetails customUserDetails) {
@@ -81,5 +87,4 @@ public class PetService {
                 pet.getId(), pet.getName(), pet.getBreed(), pet.getBirthDate(),
                 pet.getGender(), pet.getWeight(), pet.getDescription(), pet.getCreateDate(), pet.getUpdatedDate());
     }
-
 }

@@ -35,7 +35,7 @@ public class PetController {
 
         PetInfoResDto petInfoResDto = petService.getPet(petId);
 
-        return new ResponseDto<>(true, "반려견 단일 조회", petInfoResDto);
+        return new ResponseDto<>(true, "반려견 단일 조회 성공", petInfoResDto);
     }
 
     @GetMapping("/pet")
@@ -43,7 +43,7 @@ public class PetController {
 
         List<PetInfoResDto> petInfoResDtos = petService.getPets(customUserDetails);
 
-        return new ResponseDto<>(true, "반려견 복수 조회", petInfoResDtos);
+        return new ResponseDto<>(true, "반려견 복수 조회 성공", petInfoResDtos);
     }
 
     @PutMapping("/pet/{petId}")
@@ -53,6 +53,14 @@ public class PetController {
 
         PetInfoResDto petInfoResDto = petService.updatePet(petId, partialPetReqDto);
 
-        return new ResponseDto<>(true, "반려견 정보 수정 조회", petInfoResDto);
+        return new ResponseDto<>(true, "반려견 정보 수정 조회 성공", petInfoResDto);
+    }
+
+    @DeleteMapping("/pet/{petId}")
+    public ResponseDto<PetInfoResDto> deletePet(@PathVariable("petId") Long petId) {
+
+        petService.deletePet(petId);
+
+        return new ResponseDto<>(true, "반려견 정보 삭제 성공", null);
     }
 }
