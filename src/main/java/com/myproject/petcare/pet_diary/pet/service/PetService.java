@@ -12,6 +12,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
@@ -42,6 +45,17 @@ public class PetService {
         return getPetInfoResDto(pet);
     }
 
+    public List<PetInfoResDto> getPets(CustomUserDetails customUserDetails) {
+        User user = getUserFromUserDetails(customUserDetails);
+        List<Pet> pets = user.getPets();
+
+        List<PetInfoResDto> list = new ArrayList<>();
+        for (Pet pet : pets) {
+            list.add(getPetInfoResDto(pet));
+        }
+        return list;
+    }
+
     private User getUserFromUserDetails(CustomUserDetails customUserDetails) {
         Long id = Long.valueOf(customUserDetails.getUsername());
         User user = userRepository.findById(id).orElse(null);
@@ -53,4 +67,6 @@ public class PetService {
                 pet.getId(), pet.getName(), pet.getBreed(), pet.getBirthDate(),
                 pet.getGender(), pet.getWeight(), pet.getDescription(), pet.getCreateDate(), pet.getUpdatedDate());
     }
+
+
 }

@@ -11,6 +11,8 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/api/v1")
 @RequiredArgsConstructor
@@ -34,5 +36,13 @@ public class PetController {
         PetInfoResDto petInfoResDto = petService.getPet(petId);
 
         return new ResponseDto<>(true, "반려견 단일 조회", petInfoResDto);
+    }
+
+    @GetMapping("/pet")
+    public ResponseDto getPets(@AuthenticationPrincipal CustomUserDetails customUserDetails) {
+
+        List<PetInfoResDto> petInfoResDtos = petService.getPets(customUserDetails);
+
+        return new ResponseDto<>(true, "반려견 복수 조회", petInfoResDtos);
     }
 }

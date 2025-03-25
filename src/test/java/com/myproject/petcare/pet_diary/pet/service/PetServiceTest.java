@@ -21,6 +21,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -43,7 +44,7 @@ class PetServiceTest {
     private PetRepository petRepository;
 
     private User testUser;
-    private Pet testPet;
+    private Pet testPet1;
     private CustomUserDetails customUserDetails;
 
     @BeforeEach
@@ -58,15 +59,25 @@ class PetServiceTest {
 
         customUserDetails = new CustomUserDetails(testUser);
 
-        testPet = new Pet();
-        testPet.setName("멍멍이");
-        testPet.setBreed("포메라니안");
-        testPet.setBirthDate(LocalDate.parse("1993-10-20"));
-        testPet.setGender(Gender.FEMALE);
-        testPet.setWeight(new BigDecimal("5.23"));
-        testPet.setDescription(null);
-        testPet.changeUser(testUser);
-        petRepository.save(testPet);
+        testPet1 = new Pet();
+        testPet1.setName("멍멍이1");
+        testPet1.setBreed("포메라니안");
+        testPet1.setBirthDate(LocalDate.parse("1993-10-20"));
+        testPet1.setGender(Gender.FEMALE);
+        testPet1.setWeight(new BigDecimal("5.23"));
+        testPet1.setDescription(null);
+        testPet1.changeUser(testUser);
+        petRepository.save(testPet1);
+
+        Pet testPet2 = new Pet();
+        testPet2.setName("멍멍이2");
+        testPet2.setBreed("포메라니안");
+        testPet2.setBirthDate(LocalDate.parse("1993-11-10"));
+        testPet2.setGender(Gender.MALE);
+        testPet2.setWeight(new BigDecimal("3.23"));
+        testPet2.setDescription(null);
+        testPet2.changeUser(testUser);
+        petRepository.save(testPet2);
     }
 
     @Test
@@ -99,15 +110,15 @@ class PetServiceTest {
         // given
 
         // when
-        PetInfoResDto petInfoResDto = petService.getPet(testPet.getId());
+        PetInfoResDto petInfoResDto = petService.getPet(testPet1.getId());
 
         //then
-        assertThat(petInfoResDto.getName()).isEqualTo(testPet.getName());
-        assertThat(petInfoResDto.getBreed()).isEqualTo(testPet.getBreed());
-        assertThat(petInfoResDto.getBirthDate()).isEqualTo(testPet.getBirthDate());
-        assertThat(petInfoResDto.getGender()).isEqualTo(testPet.getGender());
-        assertThat(petInfoResDto.getWeight()).isEqualTo(testPet.getWeight());
-        assertThat(petInfoResDto.getDescription()).isEqualTo(testPet.getDescription());
+        assertThat(petInfoResDto.getName()).isEqualTo(testPet1.getName());
+        assertThat(petInfoResDto.getBreed()).isEqualTo(testPet1.getBreed());
+        assertThat(petInfoResDto.getBirthDate()).isEqualTo(testPet1.getBirthDate());
+        assertThat(petInfoResDto.getGender()).isEqualTo(testPet1.getGender());
+        assertThat(petInfoResDto.getWeight()).isEqualTo(testPet1.getWeight());
+        assertThat(petInfoResDto.getDescription()).isEqualTo(testPet1.getDescription());
     }
 
     @Test
@@ -117,6 +128,26 @@ class PetServiceTest {
 
         // when & then
         assertThrows(NotFoundException.class,() -> petService.getPet(13L));
+    }
+
+    @Test
+    @DisplayName("반려견 복수 조회 성공")
+    void getPetsSuccess() {
+        // given
+
+        // when
+        List<PetInfoResDto> pets = petService.getPets(customUserDetails);
+
+        //then
+        PetInfoResDto petInfoResDto = pets.get(0);
+
+        assertThat(pets.size()).isEqualTo(2);
+        assertThat(petInfoResDto.getName()).isEqualTo(testPet1.getName());
+        assertThat(petInfoResDto.getBreed()).isEqualTo(testPet1.getBreed());
+        assertThat(petInfoResDto.getBirthDate()).isEqualTo(testPet1.getBirthDate());
+        assertThat(petInfoResDto.getGender()).isEqualTo(testPet1.getGender());
+        assertThat(petInfoResDto.getWeight()).isEqualTo(testPet1.getWeight());
+        assertThat(petInfoResDto.getDescription()).isEqualTo(testPet1.getDescription());
     }
 
 }
