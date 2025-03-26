@@ -29,16 +29,16 @@ class AuthControllerTest {
     void signupSuccess() throws Exception {
         // Given : 유효한 회원 가입 데이터 준비
         SignupReqDto signupReqDto = new SignupReqDto();
-        signupReqDto.setEmail("test@gmail.com");
-        signupReqDto.setPassword("TestPassword1!!");
+        signupReqDto.setEmail("test2@gmail.com");
+        signupReqDto.setPassword("TestPassword2!!");
         signupReqDto.setName("테스트유저");
         signupReqDto.setPhone("010-1234-1234");
 
         // When & Then : POST 요청 후 성공 응답 확인
-        mockMvc.perform(post("/v1/auth/signup")
+        mockMvc.perform(post("/api/v1/auth/signup")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(signupReqDto)))
-                .andExpect(status().isOk())
+                .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.success").value(true))
                 .andExpect(jsonPath("$.message").value("회원 가입 성공"));
     }
@@ -49,12 +49,12 @@ class AuthControllerTest {
         // Given : 유효한 회원 가입 데이터 준비
         SignupReqDto signupReqDto = new SignupReqDto();
         signupReqDto.setEmail("test_gmail.com");
-        signupReqDto.setPassword("TestPassword1!!");
+        signupReqDto.setPassword("TestPassword2!!");
         signupReqDto.setName("테스트유저");
         signupReqDto.setPhone("010-1234-1234");
 
         // When & Then : POST 요청 후 성공 응답 확인
-        mockMvc.perform(post("/v1/auth/signup")
+        mockMvc.perform(post("/api/v1/auth/signup")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(signupReqDto)))
                 .andExpect(status().isBadRequest())
@@ -73,7 +73,7 @@ class AuthControllerTest {
         signupReqDto.setPhone("010-1234-1234");
 
         // When & Then : POST 요청 후 성공 응답 확인
-        mockMvc.perform(post("/v1/auth/signup")
+        mockMvc.perform(post("/api/v1/auth/signup")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(signupReqDto)))
                 .andExpect(status().isBadRequest())

@@ -50,8 +50,8 @@ class PetServiceTest {
     @BeforeEach
     void before() {
         testUser = new User();
-        testUser.setEmail("test1@gmail.com");
-        testUser.setPassword(bCryptPasswordEncoder.encode("TestPassword1!!"));
+        testUser.setEmail("test2@gmail.com");
+        testUser.setPassword(bCryptPasswordEncoder.encode("TestPassword2!!"));
         testUser.setName("테스트유저1");
         testUser.setPhone("010-1234-1234");
         testUser.setRole(Role.USER);

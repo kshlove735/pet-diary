@@ -49,8 +49,8 @@ class UserServiceTest {
     @BeforeEach
     void before(){
         testUser = new User();
-        testUser.setEmail("test1@gmail.com");
-        testUser.setPassword(bCryptPasswordEncoder.encode("TestPassword1!!"));
+        testUser.setEmail("test2@gmail.com");
+        testUser.setPassword(bCryptPasswordEncoder.encode("TestPassword2!!"));
         testUser.setName("테스트유저1");
         testUser.setPhone("010-1234-1234");
         testUser.setRole(Role.USER);
@@ -109,7 +109,7 @@ class UserServiceTest {
     void checkPasswordSuccess() {
         // given : 비밀번호 동일 여부 확인 데이터 준비
         CheckPasswordReqDto checkPasswordReqDto = new CheckPasswordReqDto();
-        checkPasswordReqDto.setCurrentPassword("TestPassword1!!");
+        checkPasswordReqDto.setCurrentPassword("TestPassword2!!");
 
         // when
         boolean isPasswordEqual = userService.checkPassword(checkPasswordReqDto, customUserDetails);
@@ -135,7 +135,7 @@ class UserServiceTest {
     void updatePasswordSuccess() {
         // given : 비밀번호 동일 여부 확인 데이터 준비
         UpdatePasswordReqDto updatePasswordReqDto = new UpdatePasswordReqDto();
-        updatePasswordReqDto.setCurrentPassword("TestPassword1!!");
+        updatePasswordReqDto.setCurrentPassword("TestPassword2!!");
         updatePasswordReqDto.setChangedPassword("changedPW1!!");
         updatePasswordReqDto.setChangedPasswordCheck("changedPW1!!");
 
@@ -143,7 +143,7 @@ class UserServiceTest {
         userService.updatePassword(updatePasswordReqDto, customUserDetails);
 
         // then
-        User passwordChangeUser = userRepository.findById(1L).orElse(null);
+        User passwordChangeUser = userRepository.findById(testUser.getId()).orElse(null);
 
         assertThat(bCryptPasswordEncoder.matches(updatePasswordReqDto.getChangedPassword(), passwordChangeUser.getPassword())).isTrue();
     }
@@ -153,7 +153,7 @@ class UserServiceTest {
     void updatePasswordFail() {
         // given : 비밀번호 동일 여부 확인 데이터 준비
         UpdatePasswordReqDto updatePasswordReqDto = new UpdatePasswordReqDto();
-        updatePasswordReqDto.setCurrentPassword("TestPassword1!!");
+        updatePasswordReqDto.setCurrentPassword("TestPassword2!!");
         updatePasswordReqDto.setChangedPassword("changedPW1!!");
         updatePasswordReqDto.setChangedPasswordCheck("differentPW1!!");
 
@@ -171,6 +171,6 @@ class UserServiceTest {
         userService.deleteUser(customUserDetails);
 
         // then
-        assertThat(userRepository.findById(1L).orElse(null)).isNull();
+        assertThat(userRepository.findById(testUser.getId()).orElse(null)).isNull();
     }
 }

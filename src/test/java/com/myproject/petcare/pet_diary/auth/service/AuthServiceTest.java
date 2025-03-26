@@ -39,7 +39,7 @@ class AuthServiceTest {
 
     @BeforeEach
     void before() {
-        for (int i = 1; i <= 10; i++) {
+        for (int i = 2; i <= 10; i++) {
             User user = new User();
             user.setEmail("test" + i + "@gmail.com");
             user.setPassword(bCryptPasswordEncoder.encode("TestPassword" + i + "!!"));
@@ -106,8 +106,8 @@ class AuthServiceTest {
         // Given : 유효한 로그인 데이터 준비
         LoginReqDto loginReqDto = new LoginReqDto();
 
-        loginReqDto.setEmail("test1@gmail.com");
-        loginReqDto.setPassword("TestPassword1!!");
+        loginReqDto.setEmail("test2@gmail.com");
+        loginReqDto.setPassword("TestPassword2!!");
 
         // When : 로그인 실행
         LoginResDto loginResDto = authService.login(loginReqDto);
@@ -142,7 +142,7 @@ class AuthServiceTest {
         // Given : 유효한 로그인 데이터 준비
         LoginReqDto loginReqDto = new LoginReqDto();
 
-        loginReqDto.setEmail("test1@gmail.com");
+        loginReqDto.setEmail("test2@gmail.com");
         loginReqDto.setPassword("wrongPassword1!!");
 
         // When & Then: 로그인 실패 -  존재하지 않는 이메일로 예외 발생
@@ -179,8 +179,8 @@ class AuthServiceTest {
     void refreshSuccess() {
         // given
         LoginReqDto loginReqDto = new LoginReqDto();
-        loginReqDto.setEmail("test1@gmail.com");
-        loginReqDto.setPassword("TestPassword1!!");
+        loginReqDto.setEmail("test2@gmail.com");
+        loginReqDto.setPassword("TestPassword2!!");
         LoginResDto loginResDto = authService.login(loginReqDto);
 
         String refreshToken = loginResDto.getRefreshToken();
