@@ -1,4 +1,4 @@
-package com.myproject.petcare.pet_diary.user;
+package com.myproject.petcare.pet_diary;
 
 import com.myproject.petcare.pet_diary.pet.entity.Pet;
 import com.myproject.petcare.pet_diary.pet.enums.Gender;
