@@ -1,7 +1,7 @@
-package com.myproject.petcare.pet_diary.health_record.entity;
+package com.myproject.petcare.pet_diary.health.entity;
 
 import com.myproject.petcare.pet_diary.common.entity.BaseEntity;
-import com.myproject.petcare.pet_diary.health_record.enums.HealthType;
+import com.myproject.petcare.pet_diary.health.enums.HealthType;
 import com.myproject.petcare.pet_diary.pet.entity.Pet;
 import jakarta.persistence.*;
 import lombok.Getter;
@@ -11,11 +11,11 @@ import java.time.LocalDate;
 
 @Entity
 @Getter
-public class HealthRecord extends BaseEntity {
+public class Health extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "health_record_id")
+    @Column(name = "health_id")
     @Comment("건강 기록 ID")
     private Long id;
 
@@ -48,7 +48,7 @@ public class HealthRecord extends BaseEntity {
     @Comment("추가 메모")
     private String notes;
 
-    public HealthRecord(Pet pet, HealthType healthType, String description, LocalDate date, LocalDate nextDueDate, String clinic, String notes) {
+    public Health(Pet pet, HealthType healthType, String description, LocalDate date, LocalDate nextDueDate, String clinic, String notes) {
         this.pet = pet;
         this.healthType = healthType;
         this.description = description;

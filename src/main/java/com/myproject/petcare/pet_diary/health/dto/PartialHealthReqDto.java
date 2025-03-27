@@ -1,6 +1,6 @@
-package com.myproject.petcare.pet_diary.health_record.dto;
+package com.myproject.petcare.pet_diary.health.dto;
 
-import com.myproject.petcare.pet_diary.health_record.enums.HealthType;
+import com.myproject.petcare.pet_diary.health.enums.HealthType;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.Getter;
@@ -10,7 +10,7 @@ import java.time.LocalDate;
 
 @Getter
 @Setter
-public class PartialHealthRecordReqDto {
+public class PartialHealthReqDto {
 
     @NotNull(message = "기록 유형(예방접종, 건강검진, 수술, 투약)은 필수 입력 항목입니다.")
     private HealthType healthType;
