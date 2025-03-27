@@ -1,8 +1,6 @@
-package com.myproject.petcare.pet_diary.health.entity;
+package com.myproject.petcare.pet_diary.diary.entity;
 
-import com.myproject.petcare.pet_diary.common.entity.BaseEntity;
-import com.myproject.petcare.pet_diary.health.enums.HealthType;
-import com.myproject.petcare.pet_diary.pet.entity.Pet;
+import com.myproject.petcare.pet_diary.diary.enums.HealthType;
 import jakarta.persistence.*;
 import lombok.Getter;
 import org.hibernate.annotations.Comment;
@@ -11,18 +9,8 @@ import java.time.LocalDate;
 
 @Entity
 @Getter
-public class Health extends BaseEntity {
-
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "health_id")
-    @Comment("건강 기록 ID")
-    private Long id;
-
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "pet_id", nullable = false)
-    @Comment("반려견 ID")
-    private Pet pet;
+@DiscriminatorValue("health")
+public class Health extends Diary {
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
@@ -44,17 +32,12 @@ public class Health extends BaseEntity {
     @Comment("병원 이름")
     private String clinic;
 
-    @Column(columnDefinition = "TEXT")
-    @Comment("추가 메모")
-    private String notes;
 
-    public Health(Pet pet, HealthType healthType, String description, LocalDate date, LocalDate nextDueDate, String clinic, String notes) {
-        this.pet = pet;
+    public Health( HealthType healthType, String description, LocalDate date, LocalDate nextDueDate, String clinic) {
         this.healthType = healthType;
         this.description = description;
         this.date = date;
         this.nextDueDate = nextDueDate;
         this.clinic = clinic;
-        this.notes = notes;
     }
 }

@@ -1,4 +1,4 @@
-package com.myproject.petcare.pet_diary.health.enums;
+package com.myproject.petcare.pet_diary.diary.enums;
 
 public enum HealthType {
     VACCINATION, CHECKUP, SURGERY, MEDICATION
