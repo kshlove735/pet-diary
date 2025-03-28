@@ -1,13 +1,16 @@
 package com.myproject.petcare.pet_diary.diary.entity;
 
 import com.myproject.petcare.pet_diary.diary.enums.MealType;
+import com.myproject.petcare.pet_diary.pet.entity.Pet;
 import jakarta.persistence.*;
+import lombok.NoArgsConstructor;
 import org.hibernate.annotations.Comment;
 
 import java.time.LocalDate;
 
 @Entity
 @DiscriminatorValue("meal")
+@NoArgsConstructor
 public class Meal extends Diary {
 
     @Column(nullable = false)
@@ -31,4 +34,7 @@ public class Meal extends Diary {
     private String reaction;
 
 
+    public Meal(Pet pet, String note) {
+        super(pet, note);
+    }
 }

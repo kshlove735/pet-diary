@@ -1,6 +1,6 @@
-package com.myproject.petcare.pet_diary.health.dto;
+package com.myproject.petcare.pet_diary.diary.dto;
 
-import com.myproject.petcare.pet_diary.health.enums.HealthType;
+import com.myproject.petcare.pet_diary.diary.enums.HealthType;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.Getter;

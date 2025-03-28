@@ -3,11 +3,17 @@ package com.myproject.petcare.pet_diary.diary.entity;
 import com.myproject.petcare.pet_diary.common.entity.BaseEntity;
 import com.myproject.petcare.pet_diary.pet.entity.Pet;
 import jakarta.persistence.*;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 import org.hibernate.annotations.Comment;
 
 @Entity
 @Inheritance(strategy = InheritanceType.SINGLE_TABLE)
 @DiscriminatorColumn
+@NoArgsConstructor
+@Getter
+@Setter
 public class Diary extends BaseEntity {
 
     @Id
@@ -24,4 +30,9 @@ public class Diary extends BaseEntity {
     @Column(columnDefinition = "TEXT")
     @Comment("추가 메모")
     private String note;
+
+    public Diary(Pet pet, String note) {
+        this.pet = pet;
+        this.note = note;
+    }
 }

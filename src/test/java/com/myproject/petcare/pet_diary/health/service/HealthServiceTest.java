@@ -1,8 +1,9 @@
 package com.myproject.petcare.pet_diary.health.service;
 
-import com.myproject.petcare.pet_diary.health.dto.HealthInfoResDto;
-import com.myproject.petcare.pet_diary.health.dto.PartialHealthReqDto;
-import com.myproject.petcare.pet_diary.health.enums.HealthType;
+import com.myproject.petcare.pet_diary.diary.dto.HealthInfoResDto;
+import com.myproject.petcare.pet_diary.diary.dto.PartialHealthReqDto;
+import com.myproject.petcare.pet_diary.diary.enums.HealthType;
+import com.myproject.petcare.pet_diary.diary.service.DiaryService;
 import com.myproject.petcare.pet_diary.jwt.CustomUserDetails;
 import com.myproject.petcare.pet_diary.pet.entity.Pet;
 import com.myproject.petcare.pet_diary.pet.enums.Gender;
@@ -41,7 +42,7 @@ class HealthServiceTest {
     private PetRepository petRepository;
 
     @Autowired
-    private HealthService healthService;
+    private DiaryService diaryService;
 
 
     private User testUser;
@@ -93,7 +94,7 @@ class HealthServiceTest {
         partialHealthReqDto1.setClinic("행복 동물병원");
         partialHealthReqDto1.setNotes("부작용 없음");
 
-        HealthInfoResDto healthInfoResDto1 = healthService.createHealth(testPet1.getId(), partialHealthReqDto1);
+        HealthInfoResDto healthInfoResDto1 = diaryService.createHealth(testPet1.getId(), partialHealthReqDto1);
 
         assertThat(healthInfoResDto1.getHealthType()).isEqualTo(partialHealthReqDto1.getHealthType());
         assertThat(healthInfoResDto1.getDescription()).isEqualTo(partialHealthReqDto1.getDescription());
@@ -106,7 +107,7 @@ class HealthServiceTest {
         partialHealthReqDto2.setHealthType(HealthType.VACCINATION);
         partialHealthReqDto2.setDate(LocalDate.parse("2025-03-25"));
 
-        HealthInfoResDto healthInfoResDto2 = healthService.createHealth(testPet1.getId(), partialHealthReqDto2);
+        HealthInfoResDto healthInfoResDto2 = diaryService.createHealth(testPet1.getId(), partialHealthReqDto2);
 
         assertThat(healthInfoResDto2.getHealthType()).isEqualTo(partialHealthReqDto2.getHealthType());
         assertThat(healthInfoResDto2.getDescription()).isEqualTo(partialHealthReqDto2.getDescription());
@@ -127,7 +128,7 @@ class HealthServiceTest {
         partialHealthReqDto1.setClinic("행복 동물병원");
         partialHealthReqDto1.setNotes("부작용 없음");
 
-        Assertions.assertThrows(DataIntegrityViolationException.class, () -> healthService.createHealth(testPet1.getId(), partialHealthReqDto1));
+        Assertions.assertThrows(DataIntegrityViolationException.class, () -> diaryService.createHealth(testPet1.getId(), partialHealthReqDto1));
 
         PartialHealthReqDto partialHealthReqDto2 = new PartialHealthReqDto();
         partialHealthReqDto2.setHealthType(HealthType.VACCINATION);
@@ -136,7 +137,7 @@ class HealthServiceTest {
         partialHealthReqDto2.setClinic("행복 동물병원");
         partialHealthReqDto2.setNotes("부작용 없음");
 
-        Assertions.assertThrows(DataIntegrityViolationException.class, () -> healthService.createHealth(testPet1.getId(), partialHealthReqDto2));
+        Assertions.assertThrows(DataIntegrityViolationException.class, () -> diaryService.createHealth(testPet1.getId(), partialHealthReqDto2));
     }
 
 }

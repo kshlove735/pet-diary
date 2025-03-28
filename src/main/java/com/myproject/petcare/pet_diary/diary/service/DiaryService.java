@@ -1,10 +1,10 @@
-package com.myproject.petcare.pet_diary.health.service;
+package com.myproject.petcare.pet_diary.diary.service;
 
 import com.myproject.petcare.pet_diary.common.exception.custom_exception.NotFoundException;
-import com.myproject.petcare.pet_diary.health.entity.Health;
-import com.myproject.petcare.pet_diary.health.repository.HealthRepository;
-import com.myproject.petcare.pet_diary.health.dto.HealthInfoResDto;
-import com.myproject.petcare.pet_diary.health.dto.PartialHealthReqDto;
+import com.myproject.petcare.pet_diary.diary.entity.Health;
+import com.myproject.petcare.pet_diary.diary.repository.DiaryRepository;
+import com.myproject.petcare.pet_diary.diary.dto.HealthInfoResDto;
+import com.myproject.petcare.pet_diary.diary.dto.PartialHealthReqDto;
 import com.myproject.petcare.pet_diary.pet.entity.Pet;
 import com.myproject.petcare.pet_diary.pet.repository.PetRepository;
 import lombok.RequiredArgsConstructor;
@@ -14,10 +14,11 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
-public class HealthService {
+public class DiaryService {
 
     private final PetRepository petRepository;
-    private final HealthRepository healthRepository;
+    private final DiaryRepository diaryRepository;
+
 
     @Transactional
     public HealthInfoResDto createHealth(Long petId, PartialHealthReqDto partialHealthReqDto) {
@@ -29,7 +30,7 @@ public class HealthService {
                 partialHealthReqDto.getClinic(), partialHealthReqDto.getNotes()
         );
 
-        healthRepository.save(health);
+        diaryRepository.save(health);
 
         HealthInfoResDto healthInfoResDto = getHealthInfoResDto(health, pet);
         return healthInfoResDto;
@@ -39,8 +40,8 @@ public class HealthService {
         return new HealthInfoResDto(
                 health.getId(), pet.getId(), health.getHealthType(),
                 health.getDescription(), health.getDate(),
-                health.getNextDueDate(), health.getClinic(), health.getNotes(),
-                health.getCreateDate(), health.getUpdatedDate()
+                health.getNextDueDate(), health.getClinic(),
+                health.getNote(), health.getCreateDate(), health.getUpdatedDate()
         );
     }
 }

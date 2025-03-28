@@ -1,8 +1,10 @@
 package com.myproject.petcare.pet_diary.diary.entity;
 
 import com.myproject.petcare.pet_diary.diary.enums.HealthType;
+import com.myproject.petcare.pet_diary.pet.entity.Pet;
 import jakarta.persistence.*;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import org.hibernate.annotations.Comment;
 
 import java.time.LocalDate;
@@ -10,6 +12,7 @@ import java.time.LocalDate;
 @Entity
 @Getter
 @DiscriminatorValue("health")
+@NoArgsConstructor
 public class Health extends Diary {
 
     @Enumerated(EnumType.STRING)
@@ -33,7 +36,8 @@ public class Health extends Diary {
     private String clinic;
 
 
-    public Health( HealthType healthType, String description, LocalDate date, LocalDate nextDueDate, String clinic) {
+    public Health(Pet pet, HealthType healthType, String description, LocalDate date, LocalDate nextDueDate, String clinic, String note) {
+        super(pet, note);
         this.healthType = healthType;
         this.description = description;
         this.date = date;

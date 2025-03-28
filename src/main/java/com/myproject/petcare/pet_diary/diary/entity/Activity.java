@@ -1,7 +1,9 @@
 package com.myproject.petcare.pet_diary.diary.entity;
 
 import com.myproject.petcare.pet_diary.diary.enums.ActivityType;
+import com.myproject.petcare.pet_diary.pet.entity.Pet;
 import jakarta.persistence.*;
+import lombok.NoArgsConstructor;
 import org.hibernate.annotations.Comment;
 
 import java.math.BigDecimal;
@@ -9,6 +11,7 @@ import java.time.LocalDate;
 
 @Entity
 @DiscriminatorValue("activity")
+@NoArgsConstructor
 public class Activity extends Diary {
 
     @Column(nullable = false)
@@ -30,4 +33,8 @@ public class Activity extends Diary {
     @Column(length = 255)
     @Comment("활동 장소")
     private String location;
+
+    public Activity(Pet pet, String note) {
+        super(pet, note);
+    }
 }

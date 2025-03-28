@@ -1,6 +1,6 @@
-package com.myproject.petcare.pet_diary.health.dto;
+package com.myproject.petcare.pet_diary.diary.dto;
 
-import com.myproject.petcare.pet_diary.health.enums.HealthType;
+import com.myproject.petcare.pet_diary.diary.enums.HealthType;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
@@ -13,7 +13,7 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 public class HealthInfoResDto {
 
-    private Long healthId;
+    private Long diaryId;
     private Long petId;
     private HealthType healthType;
     private String description;
