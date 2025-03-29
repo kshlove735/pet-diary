@@ -8,8 +8,10 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.hibernate.annotations.Comment;
 
+import java.time.LocalDate;
+
 @Entity
-@Inheritance(strategy = InheritanceType.SINGLE_TABLE)
+@Inheritance(strategy = InheritanceType.JOINED)
 @DiscriminatorColumn
 @NoArgsConstructor
 @Getter
@@ -27,12 +29,17 @@ public class Diary extends BaseEntity {
     @Comment("반려견 ID")
     private Pet pet;
 
+    @Column(nullable = false)
+    @Comment("일기 행동 날짜")
+    private LocalDate date;
+
     @Column(columnDefinition = "TEXT")
     @Comment("추가 메모")
-    private String note;
+    private String description;
 
-    public Diary(Pet pet, String note) {
+    public Diary(Pet pet, LocalDate date, String description) {
         this.pet = pet;
-        this.note = note;
+        this.date = date;
+        this.description = description;
     }
 }

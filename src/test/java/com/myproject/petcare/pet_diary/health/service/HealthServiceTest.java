@@ -2,7 +2,9 @@ package com.myproject.petcare.pet_diary.health.service;
 
 import com.myproject.petcare.pet_diary.diary.dto.HealthInfoResDto;
 import com.myproject.petcare.pet_diary.diary.dto.PartialHealthReqDto;
+import com.myproject.petcare.pet_diary.diary.entity.Health;
 import com.myproject.petcare.pet_diary.diary.enums.HealthType;
+import com.myproject.petcare.pet_diary.diary.repository.DiaryRepository;
 import com.myproject.petcare.pet_diary.diary.service.DiaryService;
 import com.myproject.petcare.pet_diary.jwt.CustomUserDetails;
 import com.myproject.petcare.pet_diary.pet.entity.Pet;
@@ -44,9 +46,13 @@ class HealthServiceTest {
     @Autowired
     private DiaryService diaryService;
 
+    @Autowired
+    private DiaryRepository diaryRepository;
+
 
     private User testUser;
-    private Pet testPet1;
+    private Pet testPet;
+    private Health testHealth;
     private CustomUserDetails customUserDetails;
 
     @BeforeEach
@@ -61,83 +67,155 @@ class HealthServiceTest {
 
         customUserDetails = new CustomUserDetails(testUser);
 
-        testPet1 = new Pet();
-        testPet1.setName("멍멍이1");
-        testPet1.setBreed("포메라니안");
-        testPet1.setBirthDate(LocalDate.parse("1993-10-20"));
-        testPet1.setGender(Gender.FEMALE);
-        testPet1.setWeight(new BigDecimal("5.23"));
-        testPet1.setDescription(null);
-        testPet1.changeUser(testUser);
-        petRepository.save(testPet1);
+        testPet = new Pet();
+        testPet.setName("멍멍이1");
+        testPet.setBreed("포메라니안");
+        testPet.setBirthDate(LocalDate.parse("1993-10-20"));
+        testPet.setGender(Gender.FEMALE);
+        testPet.setWeight(new BigDecimal("5.23"));
+        testPet.setDescription(null);
+        testPet.changeUser(testUser);
+        petRepository.save(testPet);
 
-        Pet testPet2 = new Pet();
-        testPet2.setName("멍멍이2");
-        testPet2.setBreed("포메라니안");
-        testPet2.setBirthDate(LocalDate.parse("1993-11-10"));
-        testPet2.setGender(Gender.MALE);
-        testPet2.setWeight(new BigDecimal("3.23"));
-        testPet2.setDescription(null);
-        testPet2.changeUser(testUser);
-        petRepository.save(testPet2);
+        testHealth = new Health();
+        testHealth.setPet(testPet);
+        testHealth.setHealthType(HealthType.VACCINATION);
+        testHealth.setDescription("광견병 예방접종 완료");
+        testHealth.setDate(LocalDate.parse("2025-03-25"));
+        testHealth.setNextDueDate(LocalDate.parse("2026-03-25"));
+        testHealth.setClinic("행복 동물병원");
+        diaryRepository.save(testHealth);
     }
 
     @Test
     @DisplayName("건강 기록 등록 성공")
     void createHealthSuccess() {
 
+        // given : 모든 속성 값 있을 때
         PartialHealthReqDto partialHealthReqDto1 = new PartialHealthReqDto();
         partialHealthReqDto1.setHealthType(HealthType.VACCINATION);
         partialHealthReqDto1.setDescription("광견병 예방접종 완료");
         partialHealthReqDto1.setDate(LocalDate.parse("2025-03-25"));
         partialHealthReqDto1.setNextDueDate(LocalDate.parse("2026-03-25"));
         partialHealthReqDto1.setClinic("행복 동물병원");
-        partialHealthReqDto1.setNotes("부작용 없음");
 
-        HealthInfoResDto healthInfoResDto1 = diaryService.createHealth(testPet1.getId(), partialHealthReqDto1);
+        // when
+        HealthInfoResDto healthInfoResDto1 = diaryService.createHealth(testPet.getId(), partialHealthReqDto1);
 
+        // then
         assertThat(healthInfoResDto1.getHealthType()).isEqualTo(partialHealthReqDto1.getHealthType());
         assertThat(healthInfoResDto1.getDescription()).isEqualTo(partialHealthReqDto1.getDescription());
         assertThat(healthInfoResDto1.getDate()).isEqualTo(partialHealthReqDto1.getDate());
         assertThat(healthInfoResDto1.getNextDueDate()).isEqualTo(partialHealthReqDto1.getNextDueDate());
         assertThat(healthInfoResDto1.getClinic()).isEqualTo(partialHealthReqDto1.getClinic());
-        assertThat(healthInfoResDto1.getNotes()).isEqualTo(partialHealthReqDto1.getNotes());
 
+
+        // given : 선택 속성 값 없을 때
         PartialHealthReqDto partialHealthReqDto2 = new PartialHealthReqDto();
         partialHealthReqDto2.setHealthType(HealthType.VACCINATION);
         partialHealthReqDto2.setDate(LocalDate.parse("2025-03-25"));
 
-        HealthInfoResDto healthInfoResDto2 = diaryService.createHealth(testPet1.getId(), partialHealthReqDto2);
+        // when
+        HealthInfoResDto healthInfoResDto2 = diaryService.createHealth(testPet.getId(), partialHealthReqDto2);
 
+
+        // then
         assertThat(healthInfoResDto2.getHealthType()).isEqualTo(partialHealthReqDto2.getHealthType());
         assertThat(healthInfoResDto2.getDescription()).isEqualTo(partialHealthReqDto2.getDescription());
         assertThat(healthInfoResDto2.getDate()).isEqualTo(partialHealthReqDto2.getDate());
         assertThat(healthInfoResDto2.getNextDueDate()).isEqualTo(partialHealthReqDto2.getNextDueDate());
         assertThat(healthInfoResDto2.getClinic()).isEqualTo(partialHealthReqDto2.getClinic());
-        assertThat(healthInfoResDto2.getNotes()).isEqualTo(partialHealthReqDto2.getNotes());
     }
 
     @Test
-    @DisplayName("건강 기록 등록 실패")
+    @DisplayName("건강 기록 등록 실패 - 필수 속성 값 없음")
     void createHealthFail() {
 
+        // given
         PartialHealthReqDto partialHealthReqDto1 = new PartialHealthReqDto();
         partialHealthReqDto1.setDescription("광견병 예방접종 완료");
         partialHealthReqDto1.setDate(LocalDate.parse("2025-03-25"));
         partialHealthReqDto1.setNextDueDate(LocalDate.parse("2026-03-25"));
         partialHealthReqDto1.setClinic("행복 동물병원");
-        partialHealthReqDto1.setNotes("부작용 없음");
 
-        Assertions.assertThrows(DataIntegrityViolationException.class, () -> diaryService.createHealth(testPet1.getId(), partialHealthReqDto1));
+        // when & then
+        Assertions.assertThrows(DataIntegrityViolationException.class, () -> diaryService.createHealth(testPet.getId(), partialHealthReqDto1));
 
+        // given
         PartialHealthReqDto partialHealthReqDto2 = new PartialHealthReqDto();
         partialHealthReqDto2.setHealthType(HealthType.VACCINATION);
         partialHealthReqDto2.setDescription("광견병 예방접종 완료");
         partialHealthReqDto2.setNextDueDate(LocalDate.parse("2026-03-25"));
         partialHealthReqDto2.setClinic("행복 동물병원");
-        partialHealthReqDto2.setNotes("부작용 없음");
 
-        Assertions.assertThrows(DataIntegrityViolationException.class, () -> diaryService.createHealth(testPet1.getId(), partialHealthReqDto2));
+        // when & then
+        Assertions.assertThrows(DataIntegrityViolationException.class, () -> diaryService.createHealth(testPet.getId(), partialHealthReqDto2));
+    }
+
+    @Test
+    @DisplayName("건강 기록 수정 성공")
+    void updateHealthSuccess() {
+        // given : 모든 속성 값 있을 때
+        Long diaryId = testHealth.getId();
+
+        PartialHealthReqDto partialHealthReqDto1 = new PartialHealthReqDto();
+        partialHealthReqDto1.setHealthType(HealthType.CHECKUP);
+        partialHealthReqDto1.setDescription("건강 검진 완료");
+        partialHealthReqDto1.setDate(LocalDate.parse("2025-03-30"));
+        partialHealthReqDto1.setNextDueDate(LocalDate.parse("2026-03-30"));
+        partialHealthReqDto1.setClinic("우리 동물병원");
+
+        // then
+        HealthInfoResDto healthInfoResDto1 = diaryService.updateHealth(diaryId, partialHealthReqDto1);
+
+        // when
+        assertThat(healthInfoResDto1.getHealthType()).isEqualTo(partialHealthReqDto1.getHealthType());
+        assertThat(healthInfoResDto1.getDescription()).isEqualTo(partialHealthReqDto1.getDescription());
+        assertThat(healthInfoResDto1.getDate()).isEqualTo(partialHealthReqDto1.getDate());
+        assertThat(healthInfoResDto1.getNextDueDate()).isEqualTo(partialHealthReqDto1.getNextDueDate());
+        assertThat(healthInfoResDto1.getClinic()).isEqualTo(partialHealthReqDto1.getClinic());
+
+
+        // given : 선택 속성 값 없을 때
+        PartialHealthReqDto partialHealthReqDto2 = new PartialHealthReqDto();
+        partialHealthReqDto2.setHealthType(HealthType.VACCINATION);
+        partialHealthReqDto2.setDate(LocalDate.parse("2025-03-25"));
+
+        // when
+        HealthInfoResDto healthInfoResDto2 = diaryService.createHealth(testPet.getId(), partialHealthReqDto2);
+
+
+        // then
+        assertThat(healthInfoResDto2.getHealthType()).isEqualTo(partialHealthReqDto2.getHealthType());
+        assertThat(healthInfoResDto2.getDescription()).isEqualTo(partialHealthReqDto2.getDescription());
+        assertThat(healthInfoResDto2.getDate()).isEqualTo(partialHealthReqDto2.getDate());
+        assertThat(healthInfoResDto2.getNextDueDate()).isEqualTo(partialHealthReqDto2.getNextDueDate());
+        assertThat(healthInfoResDto2.getClinic()).isEqualTo(partialHealthReqDto2.getClinic());
+    }
+
+    @Test
+    @DisplayName("건강 기록 수정 실패 - 필수 속성 값 없음")
+    void updateHealthFail() {
+
+        // given
+        PartialHealthReqDto partialHealthReqDto1 = new PartialHealthReqDto();
+        partialHealthReqDto1.setDescription("광견병 예방접종 완료");
+        partialHealthReqDto1.setDate(LocalDate.parse("2025-03-25"));
+        partialHealthReqDto1.setNextDueDate(LocalDate.parse("2026-03-25"));
+        partialHealthReqDto1.setClinic("행복 동물병원");
+
+        // when & then
+        Assertions.assertThrows(DataIntegrityViolationException.class, () -> diaryService.createHealth(testPet.getId(), partialHealthReqDto1));
+
+        // given
+        PartialHealthReqDto partialHealthReqDto2 = new PartialHealthReqDto();
+        partialHealthReqDto2.setHealthType(HealthType.VACCINATION);
+        partialHealthReqDto2.setDescription("광견병 예방접종 완료");
+        partialHealthReqDto2.setNextDueDate(LocalDate.parse("2026-03-25"));
+        partialHealthReqDto2.setClinic("행복 동물병원");
+
+        // when & then
+        Assertions.assertThrows(DataIntegrityViolationException.class, () -> diaryService.createHealth(testPet.getId(), partialHealthReqDto2));
     }
 
 }

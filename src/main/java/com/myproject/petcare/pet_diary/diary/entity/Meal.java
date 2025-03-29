@@ -13,10 +13,6 @@ import java.time.LocalDate;
 @NoArgsConstructor
 public class Meal extends Diary {
 
-    @Column(nullable = false)
-    @Comment("식사 날짜")
-    private LocalDate date;
-
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     @Comment("식사 유형(아침, 점심, 저녁, 간식)")
@@ -34,7 +30,7 @@ public class Meal extends Diary {
     private String reaction;
 
 
-    public Meal(Pet pet, String note) {
-        super(pet, note);
+    public Meal(Pet pet, LocalDate date, String description) {
+        super(pet, date, description);
     }
 }

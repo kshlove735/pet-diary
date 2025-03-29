@@ -25,7 +25,4 @@ public class PartialHealthReqDto {
 
     @Size(max = 50, message = "병원 이름은 50자를 초과할 수 없습니다.")
     private String clinic;
-
-    @Size(max = 1000, message = "추가 메모는 1000자를 초과할 수 없습니다.")
-    private String notes;
 }

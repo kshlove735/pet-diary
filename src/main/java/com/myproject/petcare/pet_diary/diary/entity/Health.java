@@ -5,28 +5,22 @@ import com.myproject.petcare.pet_diary.pet.entity.Pet;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 import org.hibernate.annotations.Comment;
 
 import java.time.LocalDate;
 
 @Entity
 @Getter
+@Setter
 @DiscriminatorValue("health")
 @NoArgsConstructor
 public class Health extends Diary {
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    @Comment("기록 유형(예방접종, 건강검진, 수술, 투약)")
+    @Comment("건강 일기 유형(예방접종, 건강검진, 수술, 투약)")
     private HealthType healthType;
-
-    @Column(columnDefinition = "TEXT")
-    @Comment("상세 내용")
-    private String description;
-
-    @Column(nullable = false)
-    @Comment("기록 날짜")
-    private LocalDate date;
 
     @Comment("다음 예정일(예: 다음 접종일)")
     private LocalDate nextDueDate;
@@ -36,11 +30,9 @@ public class Health extends Diary {
     private String clinic;
 
 
-    public Health(Pet pet, HealthType healthType, String description, LocalDate date, LocalDate nextDueDate, String clinic, String note) {
-        super(pet, note);
+    public Health(Pet pet, HealthType healthType, String description, LocalDate date, LocalDate nextDueDate, String clinic) {
+        super(pet, date, description);
         this.healthType = healthType;
-        this.description = description;
-        this.date = date;
         this.nextDueDate = nextDueDate;
         this.clinic = clinic;
     }

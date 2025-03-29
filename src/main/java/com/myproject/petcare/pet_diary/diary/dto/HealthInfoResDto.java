@@ -20,7 +20,6 @@ public class HealthInfoResDto {
     private LocalDate date;
     private LocalDate nextDueDate;
     private String clinic;
-    private String notes;
     private LocalDateTime createDate;
     private LocalDateTime updatedDate;
 }

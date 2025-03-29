@@ -13,16 +13,12 @@ import java.time.LocalDate;
 @NoArgsConstructor
 public class Grooming extends Diary {
 
-    @Column(nullable = false)
-    @Comment("미용 날짜")
-    private LocalDate date;
-
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     @Comment("미용 유형(목욕, 이발, 발톱 손질, 귀 청소, 치아 관리)")
     private GroomingType groomingType;
 
-    public Grooming(Pet pet, String note) {
-        super(pet, note);
+    public Grooming(Pet pet, LocalDate date, String description) {
+        super(pet, date, description);
     }
 }

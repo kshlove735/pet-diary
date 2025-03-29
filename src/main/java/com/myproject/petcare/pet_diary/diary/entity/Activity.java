@@ -14,10 +14,6 @@ import java.time.LocalDate;
 @NoArgsConstructor
 public class Activity extends Diary {
 
-    @Column(nullable = false)
-    @Comment("활동 날짜")
-    private LocalDate date;
-
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     @Comment("활동 유형(산책, 놀이, 훈련, 수영)")
@@ -34,7 +30,7 @@ public class Activity extends Diary {
     @Comment("활동 장소")
     private String location;
 
-    public Activity(Pet pet, String note) {
-        super(pet, note);
+    public Activity(Pet pet, LocalDate date, String description) {
+        super(pet, date, description);
     }
 }
