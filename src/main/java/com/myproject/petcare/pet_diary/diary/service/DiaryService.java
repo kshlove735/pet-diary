@@ -1,12 +1,10 @@
 package com.myproject.petcare.pet_diary.diary.service;
 
 import com.myproject.petcare.pet_diary.common.exception.custom_exception.NotFoundException;
-import com.myproject.petcare.pet_diary.diary.dto.GroomingInfoResDto;
-import com.myproject.petcare.pet_diary.diary.dto.HealthInfoResDto;
-import com.myproject.petcare.pet_diary.diary.dto.PartialGroomingReqDto;
-import com.myproject.petcare.pet_diary.diary.dto.PartialHealthReqDto;
+import com.myproject.petcare.pet_diary.diary.dto.*;
 import com.myproject.petcare.pet_diary.diary.entity.Grooming;
 import com.myproject.petcare.pet_diary.diary.entity.Health;
+import com.myproject.petcare.pet_diary.diary.entity.Meal;
 import com.myproject.petcare.pet_diary.diary.repository.DiaryRepository;
 import com.myproject.petcare.pet_diary.pet.entity.Pet;
 import com.myproject.petcare.pet_diary.pet.repository.PetRepository;
@@ -56,6 +54,21 @@ public class DiaryService {
         return groomingInfoResDto;
     }
 
+    @Transactional
+    public MealInfoResDto createMeal(Long petId, PartialMealReqDto partialMealReqDto) {
+        Pet pet = petRepository.findById(petId).orElseThrow(() -> new NotFoundException("해당하는 반려견이 없습니다."));
+
+        Meal meal = new Meal(
+                pet, partialMealReqDto.getDate(),
+                partialMealReqDto.getDescription(), partialMealReqDto.getMealType(),
+                partialMealReqDto.getFoodBrand(), partialMealReqDto.getFoodAmount()
+        );
+
+        diaryRepository.save(meal);
+
+        MealInfoResDto mealInfoResDto = getMealInfoResDto(meal);
+        return mealInfoResDto;
+    }
 
     @Transactional
     public HealthInfoResDto updateHealth(Long diaryId, PartialHealthReqDto partialHealthReqDto) {
@@ -96,6 +109,30 @@ public class DiaryService {
         return groomingInfoResDto;
     }
 
+    @Transactional
+    public MealInfoResDto updateMeal(Long diaryId, PartialMealReqDto partialMealReqDto) {
+        Meal meal = (Meal) diaryRepository.findById(diaryId).orElseThrow(() -> new NotFoundException("해당하는 일기가 없습니다."));
+
+        meal.setMealType(partialMealReqDto.getMealType());
+
+        if(StringUtils.hasText(partialMealReqDto.getFoodBrand())){
+            meal.setFoodBrand(partialMealReqDto.getFoodBrand());
+        }
+
+        if(partialMealReqDto.getFoodAmount() != null){
+            meal.setFoodAmount(partialMealReqDto.getFoodAmount());
+        }
+
+        meal.setDate(partialMealReqDto.getDate());
+
+        if(StringUtils.hasText(partialMealReqDto.getDescription())){
+            meal.setDescription(partialMealReqDto.getDescription());
+        }
+
+        MealInfoResDto mealInfoResDto = getMealInfoResDto(meal);
+        return mealInfoResDto;
+    }
+
     private HealthInfoResDto getHealthInfoResDto(Health health) {
         return new HealthInfoResDto(
                 health.getId(), health.getPet().getId(),
@@ -110,6 +147,15 @@ public class DiaryService {
                 grooming.getId(), grooming.getPet().getId(),
                 grooming.getDate(), grooming.getDescription(),
                 grooming.getGroomingType(), grooming.getCreateDate(), grooming.getUpdatedDate()
+        );
+    }
+
+    private  MealInfoResDto getMealInfoResDto(Meal meal) {
+        return new MealInfoResDto(
+                meal.getId(), meal.getPet().getId(), meal.getDate(),
+                meal.getDescription(), meal.getMealType(),
+                meal.getFoodBrand(), meal.getFoodAmount(),
+                meal.getCreateDate(), meal.getUpdatedDate()
         );
     }
 }

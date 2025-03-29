@@ -1,10 +1,7 @@
 package com.myproject.petcare.pet_diary.diary.controller;
 
 import com.myproject.petcare.pet_diary.common.dto.ResponseDto;
-import com.myproject.petcare.pet_diary.diary.dto.GroomingInfoResDto;
-import com.myproject.petcare.pet_diary.diary.dto.HealthInfoResDto;
-import com.myproject.petcare.pet_diary.diary.dto.PartialGroomingReqDto;
-import com.myproject.petcare.pet_diary.diary.dto.PartialHealthReqDto;
+import com.myproject.petcare.pet_diary.diary.dto.*;
 import com.myproject.petcare.pet_diary.diary.service.DiaryService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -38,6 +35,16 @@ public class DiaryController {
         return new ResponseDto<>(true, "미용 기록 등록 성공", groomingInfoResDto);
     }
 
+    @PostMapping("/diary/{petId}/meal")
+    @ResponseStatus(HttpStatus.CREATED)
+    public ResponseDto<MealInfoResDto> createMeal(
+            @PathVariable("petId") Long petId,
+            @RequestBody @Validated PartialMealReqDto partialMealReqDto
+            ){
+        MealInfoResDto mealInfoResDto = diaryService.createMeal(petId, partialMealReqDto);
+        return new ResponseDto<>(true, "식사 기록 등록 성공", mealInfoResDto);
+    }
+
     @PutMapping("/diary/{diaryId}/health")
     public ResponseDto<HealthInfoResDto> updateHealth(
             @PathVariable("diaryId") Long diaryId,
@@ -54,5 +61,14 @@ public class DiaryController {
     ){
         GroomingInfoResDto groomingInfoResDto = diaryService.updateGrooming(diaryId, partialHealthReqDto);
         return new ResponseDto<>(true, "미용 기록 수정 성공", groomingInfoResDto);
+    }
+
+    @PutMapping("/diary/{diaryId}/meal")
+    public ResponseDto<MealInfoResDto> updateMeal(
+            @PathVariable("diaryId") Long diaryId,
+            @RequestBody @Validated PartialMealReqDto partialMealReqDto
+    ){
+        MealInfoResDto mealInfoResDto = diaryService.updateMeal(diaryId, partialMealReqDto);
+        return new ResponseDto<>(true, "식사 기록 수정 성공", mealInfoResDto);
     }
 }

@@ -1,13 +1,12 @@
 package com.myproject.petcare.pet_diary.health.service;
 
-import com.myproject.petcare.pet_diary.diary.dto.GroomingInfoResDto;
-import com.myproject.petcare.pet_diary.diary.dto.HealthInfoResDto;
-import com.myproject.petcare.pet_diary.diary.dto.PartialGroomingReqDto;
-import com.myproject.petcare.pet_diary.diary.dto.PartialHealthReqDto;
+import com.myproject.petcare.pet_diary.diary.dto.*;
 import com.myproject.petcare.pet_diary.diary.entity.Grooming;
 import com.myproject.petcare.pet_diary.diary.entity.Health;
+import com.myproject.petcare.pet_diary.diary.entity.Meal;
 import com.myproject.petcare.pet_diary.diary.enums.GroomingType;
 import com.myproject.petcare.pet_diary.diary.enums.HealthType;
+import com.myproject.petcare.pet_diary.diary.enums.MealType;
 import com.myproject.petcare.pet_diary.diary.repository.DiaryRepository;
 import com.myproject.petcare.pet_diary.diary.service.DiaryService;
 import com.myproject.petcare.pet_diary.jwt.CustomUserDetails;
@@ -58,6 +57,7 @@ class HealthServiceTest {
     private Pet testPet;
     private Health testHealth;
     private Grooming testGrooming;
+    private Meal testMeal;
     private CustomUserDetails customUserDetails;
 
     @BeforeEach
@@ -97,6 +97,15 @@ class HealthServiceTest {
         testGrooming.setDate(LocalDate.parse("2025-03-25"));
         testGrooming.setGroomingType(GroomingType.HAIRCUT);
         diaryRepository.save(testGrooming);
+
+        testMeal = new Meal();
+        testMeal.setPet(testPet);
+        testMeal.setDescription("아침에 평소보다 식욕이 좋았습니다. 사료를 거의 다 먹었고 물도 많이 마셨습니다.");
+        testMeal.setDate(LocalDate.parse("2025-03-25"));
+        testMeal.setMealType(MealType.BREAKFAST);
+        testMeal.setFoodBrand("로얄캐닌 미니 어덜트");
+        testMeal.setFoodAmount(100);
+        diaryRepository.save(testMeal);
     }
 
     @Test
@@ -276,8 +285,74 @@ class HealthServiceTest {
         assertThat(groomingInfoResDto2.getGroomingType()).isEqualTo(partialGroomingReqDto1.getGroomingType());
     }
 
+    @Test
+    @DisplayName("식사 기록 등록 성공")
+    void createMealSuccess() {
+
+        // given : 모든 속성 값 있을 때
+        PartialMealReqDto partialMealReqDto = new PartialMealReqDto();
+        partialMealReqDto.setDescription("아침에 평소보다 식욕이 좋았습니다. 사료를 거의 다 먹었고 물도 많이 마셨습니다.");
+        partialMealReqDto.setDate(LocalDate.parse("2025-03-25"));
+        partialMealReqDto.setMealType(MealType.BREAKFAST);
+        partialMealReqDto.setFoodBrand("로얄캐닌 미니 어덜트");
+        partialMealReqDto.setFoodAmount(100);
+
+        // when
+        MealInfoResDto mealInfoResDto = diaryService.createMeal(testPet.getId(), partialMealReqDto);
+
+        // then
+        assertThat(mealInfoResDto.getDescription()).isEqualTo(partialMealReqDto.getDescription());
+        assertThat(mealInfoResDto.getDate()).isEqualTo(partialMealReqDto.getDate());
+        assertThat(mealInfoResDto.getMealType()).isEqualTo(partialMealReqDto.getMealType());
+        assertThat(mealInfoResDto.getFoodBrand()).isEqualTo(partialMealReqDto.getFoodBrand());
+        assertThat(mealInfoResDto.getFoodAmount()).isEqualTo(partialMealReqDto.getFoodAmount());
+    }
+
+    @Test
+    @DisplayName("식사 기록 등록 실패 - 필수 속성 값 없음")
+    void createMealFail() {
+
+        // given : 필수 속성 값이 없을 때
+        PartialMealReqDto partialMealReqDto1 = new PartialMealReqDto();
+        partialMealReqDto1.setDescription("아침에 평소보다 식욕이 좋았습니다. 사료를 거의 다 먹었고 물도 많이 마셨습니다.");
+        partialMealReqDto1.setDate(LocalDate.parse("2025-03-25"));
+        partialMealReqDto1.setFoodBrand("로얄캐닌 미니 어덜트");
+        partialMealReqDto1.setFoodAmount(100);
+
+        // when & then
+        assertThrows(DataIntegrityViolationException.class, () -> diaryService.createMeal(testPet.getId(), partialMealReqDto1));
 
 
+        // given : 필수 속성 값이 없을 때
+        PartialMealReqDto partialMealReqDto2 = new PartialMealReqDto();
+        partialMealReqDto2.setDescription("아침에 평소보다 식욕이 좋았습니다. 사료를 거의 다 먹었고 물도 많이 마셨습니다.");
+        partialMealReqDto2.setMealType(MealType.BREAKFAST);
+        partialMealReqDto2.setFoodBrand("로얄캐닌 미니 어덜트");
+        partialMealReqDto2.setFoodAmount(100);
 
+        // when & then
+        assertThrows(DataIntegrityViolationException.class, () -> diaryService.createMeal(testPet.getId(), partialMealReqDto2));
+    }
 
+    @Test
+    @DisplayName("식사 기록 수정 성공")
+    void updateMealSuccess() {
+
+        // given : 모든 속성 값 있을 때
+        PartialMealReqDto partialMealReqDto1 = new PartialMealReqDto();
+        partialMealReqDto1.setDescription("저녁 식사 후 약간의 소화 불량 증상이 있었습니다. 내일부터는 급여량을 조금 줄여볼 예정입니다.");
+        partialMealReqDto1.setDate(LocalDate.parse("2025-03-30"));
+        partialMealReqDto1.setMealType(MealType.DINNER);
+        partialMealReqDto1.setFoodBrand("내추럴발란스 오리지널 울트라");
+        partialMealReqDto1.setFoodAmount(120);
+        // when
+        MealInfoResDto mealInfoResDto1 = diaryService.updateMeal(testMeal.getId(), partialMealReqDto1);
+
+        // then
+        assertThat(mealInfoResDto1.getDescription()).isEqualTo(partialMealReqDto1.getDescription());
+        assertThat(mealInfoResDto1.getDate()).isEqualTo(partialMealReqDto1.getDate());
+        assertThat(mealInfoResDto1.getMealType()).isEqualTo(partialMealReqDto1.getMealType());
+        assertThat(mealInfoResDto1.getFoodBrand()).isEqualTo(partialMealReqDto1.getFoodBrand());
+        assertThat(mealInfoResDto1.getFoodAmount()).isEqualTo(partialMealReqDto1.getFoodAmount());
+    }
 }
