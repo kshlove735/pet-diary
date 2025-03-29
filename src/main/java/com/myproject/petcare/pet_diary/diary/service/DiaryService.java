@@ -1,8 +1,11 @@
 package com.myproject.petcare.pet_diary.diary.service;
 
 import com.myproject.petcare.pet_diary.common.exception.custom_exception.NotFoundException;
+import com.myproject.petcare.pet_diary.diary.dto.GroomingInfoResDto;
 import com.myproject.petcare.pet_diary.diary.dto.HealthInfoResDto;
+import com.myproject.petcare.pet_diary.diary.dto.PartialGroomingReqDto;
 import com.myproject.petcare.pet_diary.diary.dto.PartialHealthReqDto;
+import com.myproject.petcare.pet_diary.diary.entity.Grooming;
 import com.myproject.petcare.pet_diary.diary.entity.Health;
 import com.myproject.petcare.pet_diary.diary.repository.DiaryRepository;
 import com.myproject.petcare.pet_diary.pet.entity.Pet;
@@ -37,6 +40,24 @@ public class DiaryService {
         return healthInfoResDto;
     }
 
+    @Transactional
+    public GroomingInfoResDto createGrooming(Long petId, PartialGroomingReqDto partialHealthReqDto) {
+        Pet pet = petRepository.findById(petId).orElseThrow(() -> new NotFoundException("해당하는 반려견이 없습니다."));
+
+        Grooming grooming = new Grooming(
+                pet, partialHealthReqDto.getDate(),
+                partialHealthReqDto.getDescription(),
+                partialHealthReqDto.getGroomingType()
+        );
+
+        diaryRepository.save(grooming);
+
+        GroomingInfoResDto groomingInfoResDto = getGroomingInfoResDto(grooming);
+        return groomingInfoResDto;
+    }
+
+
+    @Transactional
     public HealthInfoResDto updateHealth(Long diaryId, PartialHealthReqDto partialHealthReqDto) {
         Health health = (Health) diaryRepository.findById(diaryId).orElseThrow(() -> new NotFoundException("해당하는 일기가 없습니다."));
 
@@ -62,10 +83,19 @@ public class DiaryService {
 
     private HealthInfoResDto getHealthInfoResDto(Health health) {
         return new HealthInfoResDto(
-                health.getId(), health.getPet().getId(), health.getHealthType(),
-                health.getDescription(), health.getDate(),
-                health.getNextDueDate(), health.getClinic(),
-                health.getCreateDate(), health.getUpdatedDate()
+                health.getId(), health.getPet().getId(),
+                health.getDate(), health.getDescription(),
+                health.getHealthType(), health.getNextDueDate(),
+                health.getClinic(), health.getCreateDate(), health.getUpdatedDate()
         );
     }
+
+    private GroomingInfoResDto getGroomingInfoResDto(Grooming grooming) {
+        return new GroomingInfoResDto(
+                grooming.getId(), grooming.getPet().getId(),
+                grooming.getDate(), grooming.getDescription(),
+                grooming.getGroomingType(), grooming.getCreateDate(), grooming.getUpdatedDate()
+        );
+    }
+
 }

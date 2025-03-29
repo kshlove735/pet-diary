@@ -1,8 +1,11 @@
 package com.myproject.petcare.pet_diary.health.service;
 
+import com.myproject.petcare.pet_diary.diary.dto.GroomingInfoResDto;
 import com.myproject.petcare.pet_diary.diary.dto.HealthInfoResDto;
+import com.myproject.petcare.pet_diary.diary.dto.PartialGroomingReqDto;
 import com.myproject.petcare.pet_diary.diary.dto.PartialHealthReqDto;
 import com.myproject.petcare.pet_diary.diary.entity.Health;
+import com.myproject.petcare.pet_diary.diary.enums.GroomingType;
 import com.myproject.petcare.pet_diary.diary.enums.HealthType;
 import com.myproject.petcare.pet_diary.diary.repository.DiaryRepository;
 import com.myproject.petcare.pet_diary.diary.service.DiaryService;
@@ -14,7 +17,6 @@ import com.myproject.petcare.pet_diary.user.entity.User;
 import com.myproject.petcare.pet_diary.user.enums.Role;
 import com.myproject.petcare.pet_diary.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -28,6 +30,7 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @SpringBootTest
 @RequiredArgsConstructor
@@ -139,7 +142,7 @@ class HealthServiceTest {
         partialHealthReqDto1.setClinic("행복 동물병원");
 
         // when & then
-        Assertions.assertThrows(DataIntegrityViolationException.class, () -> diaryService.createHealth(testPet.getId(), partialHealthReqDto1));
+        assertThrows(DataIntegrityViolationException.class, () -> diaryService.createHealth(testPet.getId(), partialHealthReqDto1));
 
         // given
         PartialHealthReqDto partialHealthReqDto2 = new PartialHealthReqDto();
@@ -149,7 +152,7 @@ class HealthServiceTest {
         partialHealthReqDto2.setClinic("행복 동물병원");
 
         // when & then
-        Assertions.assertThrows(DataIntegrityViolationException.class, () -> diaryService.createHealth(testPet.getId(), partialHealthReqDto2));
+        assertThrows(DataIntegrityViolationException.class, () -> diaryService.createHealth(testPet.getId(), partialHealthReqDto2));
     }
 
     @Test
@@ -205,7 +208,8 @@ class HealthServiceTest {
         partialHealthReqDto1.setClinic("행복 동물병원");
 
         // when & then
-        Assertions.assertThrows(DataIntegrityViolationException.class, () -> diaryService.createHealth(testPet.getId(), partialHealthReqDto1));
+        assertThrows(DataIntegrityViolationException.class, () -> diaryService.createHealth(testPet.getId(), partialHealthReqDto1));
+
 
         // given
         PartialHealthReqDto partialHealthReqDto2 = new PartialHealthReqDto();
@@ -215,7 +219,49 @@ class HealthServiceTest {
         partialHealthReqDto2.setClinic("행복 동물병원");
 
         // when & then
-        Assertions.assertThrows(DataIntegrityViolationException.class, () -> diaryService.createHealth(testPet.getId(), partialHealthReqDto2));
+        assertThrows(DataIntegrityViolationException.class, () -> diaryService.createHealth(testPet.getId(), partialHealthReqDto2));
     }
+
+    @Test
+    @DisplayName("미용 기록 등록 성공")
+    void createGroomingSuccess() {
+
+        // given : 모든 속성 값 있을 때
+        PartialGroomingReqDto partialGroomingReqDto1 = new PartialGroomingReqDto();
+        partialGroomingReqDto1.setDescription("이발");
+        partialGroomingReqDto1.setDate(LocalDate.parse("2025-03-25"));
+        partialGroomingReqDto1.setGroomingType(GroomingType.HAIRCUT);
+        // when
+        GroomingInfoResDto groomingInfoResDto1 = diaryService.createGrooming(testPet.getId(), partialGroomingReqDto1);
+
+        // then
+        assertThat(groomingInfoResDto1.getDescription()).isEqualTo(partialGroomingReqDto1.getDescription());
+        assertThat(groomingInfoResDto1.getDate()).isEqualTo(partialGroomingReqDto1.getDate());
+        assertThat(groomingInfoResDto1.getGroomingType()).isEqualTo(partialGroomingReqDto1.getGroomingType());
+    }
+
+    @Test
+    @DisplayName("미용 기록 등록 실패 - 필수 속성 값 없음")
+    void createGroomingFail() {
+
+        // given : 필수 속성 값이 없을 때
+        PartialGroomingReqDto partialGroomingReqDto1 = new PartialGroomingReqDto();
+        partialGroomingReqDto1.setDescription("이발");
+        partialGroomingReqDto1.setDate(LocalDate.parse("2025-03-25"));
+
+        // when & then
+        assertThrows(DataIntegrityViolationException.class, () -> diaryService.createGrooming(testPet.getId(), partialGroomingReqDto1));
+
+
+        // given : 필수 속성 값이 없을 때
+        PartialGroomingReqDto partialGroomingReqDto2 = new PartialGroomingReqDto();
+        partialGroomingReqDto2.setDescription("이발");
+        partialGroomingReqDto2.setGroomingType(GroomingType.HAIRCUT);
+
+        // when & then
+        assertThrows(DataIntegrityViolationException.class, () -> diaryService.createGrooming(testPet.getId(), partialGroomingReqDto2));
+    }
+
+
 
 }
