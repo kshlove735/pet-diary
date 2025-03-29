@@ -25,7 +25,7 @@ public class DiaryController {
             @RequestBody @Validated PartialHealthReqDto partialHealthReqDto
     ){
         HealthInfoResDto healthInfoResDto = diaryService.createHealth(petId, partialHealthReqDto);
-        return new ResponseDto<>(true, "건강 기록 성공", healthInfoResDto);
+        return new ResponseDto<>(true, "건강 기록 등록 성공", healthInfoResDto);
     }
 
     @PostMapping("/diary/{petId}/grooming")
@@ -35,15 +35,24 @@ public class DiaryController {
             @RequestBody @Validated PartialGroomingReqDto partialHealthReqDto
             ){
         GroomingInfoResDto groomingInfoResDto = diaryService.createGrooming(petId, partialHealthReqDto);
-        return new ResponseDto<>(true, "미용 기록 성공", groomingInfoResDto);
+        return new ResponseDto<>(true, "미용 기록 등록 성공", groomingInfoResDto);
     }
 
     @PutMapping("/diary/{diaryId}/health")
     public ResponseDto<HealthInfoResDto> updateHealth(
-            @PathVariable("diary") Long diaryId,
+            @PathVariable("diaryId") Long diaryId,
             @RequestBody @Validated PartialHealthReqDto partialHealthReqDto
     ){
         HealthInfoResDto healthInfoResDto = diaryService.updateHealth(diaryId, partialHealthReqDto);
-        return new ResponseDto<>(true, "건강 기록 성공", healthInfoResDto);
+        return new ResponseDto<>(true, "건강 기록 수정 성공", healthInfoResDto);
+    }
+
+    @PutMapping("/diary/{diaryId}/grooming")
+    public ResponseDto<GroomingInfoResDto> updateGrooming(
+            @PathVariable("diaryId") Long diaryId,
+            @RequestBody @Validated PartialGroomingReqDto partialHealthReqDto
+    ){
+        GroomingInfoResDto groomingInfoResDto = diaryService.updateGrooming(diaryId, partialHealthReqDto);
+        return new ResponseDto<>(true, "미용 기록 수정 성공", groomingInfoResDto);
     }
 }

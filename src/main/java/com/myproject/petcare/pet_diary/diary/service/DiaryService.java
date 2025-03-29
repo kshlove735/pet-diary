@@ -81,6 +81,21 @@ public class DiaryService {
         return healthInfoResDto;
     }
 
+    @Transactional
+    public GroomingInfoResDto updateGrooming(Long diaryId, PartialGroomingReqDto partialHealthReqDto) {
+        Grooming grooming = (Grooming) diaryRepository.findById(diaryId).orElseThrow(() -> new NotFoundException("해당하는 일기가 없습니다."));
+
+        grooming.setGroomingType(partialHealthReqDto.getGroomingType());
+        grooming.setDate(partialHealthReqDto.getDate());
+
+        if(StringUtils.hasText(partialHealthReqDto.getDescription())){
+            grooming.setDescription(partialHealthReqDto.getDescription());
+        }
+
+        GroomingInfoResDto groomingInfoResDto = getGroomingInfoResDto(grooming);
+        return groomingInfoResDto;
+    }
+
     private HealthInfoResDto getHealthInfoResDto(Health health) {
         return new HealthInfoResDto(
                 health.getId(), health.getPet().getId(),
@@ -97,5 +112,4 @@ public class DiaryService {
                 grooming.getGroomingType(), grooming.getCreateDate(), grooming.getUpdatedDate()
         );
     }
-
 }

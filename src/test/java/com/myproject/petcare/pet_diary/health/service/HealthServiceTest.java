@@ -4,6 +4,7 @@ import com.myproject.petcare.pet_diary.diary.dto.GroomingInfoResDto;
 import com.myproject.petcare.pet_diary.diary.dto.HealthInfoResDto;
 import com.myproject.petcare.pet_diary.diary.dto.PartialGroomingReqDto;
 import com.myproject.petcare.pet_diary.diary.dto.PartialHealthReqDto;
+import com.myproject.petcare.pet_diary.diary.entity.Grooming;
 import com.myproject.petcare.pet_diary.diary.entity.Health;
 import com.myproject.petcare.pet_diary.diary.enums.GroomingType;
 import com.myproject.petcare.pet_diary.diary.enums.HealthType;
@@ -56,6 +57,7 @@ class HealthServiceTest {
     private User testUser;
     private Pet testPet;
     private Health testHealth;
+    private Grooming testGrooming;
     private CustomUserDetails customUserDetails;
 
     @BeforeEach
@@ -88,6 +90,13 @@ class HealthServiceTest {
         testHealth.setNextDueDate(LocalDate.parse("2026-03-25"));
         testHealth.setClinic("행복 동물병원");
         diaryRepository.save(testHealth);
+
+        testGrooming = new Grooming();
+        testGrooming.setPet(testPet);
+        testGrooming.setDescription("이발");
+        testGrooming.setDate(LocalDate.parse("2025-03-25"));
+        testGrooming.setGroomingType(GroomingType.HAIRCUT);
+        diaryRepository.save(testGrooming);
     }
 
     @Test
@@ -196,31 +205,6 @@ class HealthServiceTest {
         assertThat(healthInfoResDto2.getClinic()).isEqualTo(partialHealthReqDto2.getClinic());
     }
 
-    @Test
-    @DisplayName("건강 기록 수정 실패 - 필수 속성 값 없음")
-    void updateHealthFail() {
-
-        // given
-        PartialHealthReqDto partialHealthReqDto1 = new PartialHealthReqDto();
-        partialHealthReqDto1.setDescription("광견병 예방접종 완료");
-        partialHealthReqDto1.setDate(LocalDate.parse("2025-03-25"));
-        partialHealthReqDto1.setNextDueDate(LocalDate.parse("2026-03-25"));
-        partialHealthReqDto1.setClinic("행복 동물병원");
-
-        // when & then
-        assertThrows(DataIntegrityViolationException.class, () -> diaryService.createHealth(testPet.getId(), partialHealthReqDto1));
-
-
-        // given
-        PartialHealthReqDto partialHealthReqDto2 = new PartialHealthReqDto();
-        partialHealthReqDto2.setHealthType(HealthType.VACCINATION);
-        partialHealthReqDto2.setDescription("광견병 예방접종 완료");
-        partialHealthReqDto2.setNextDueDate(LocalDate.parse("2026-03-25"));
-        partialHealthReqDto2.setClinic("행복 동물병원");
-
-        // when & then
-        assertThrows(DataIntegrityViolationException.class, () -> diaryService.createHealth(testPet.getId(), partialHealthReqDto2));
-    }
 
     @Test
     @DisplayName("미용 기록 등록 성공")
@@ -261,6 +245,38 @@ class HealthServiceTest {
         // when & then
         assertThrows(DataIntegrityViolationException.class, () -> diaryService.createGrooming(testPet.getId(), partialGroomingReqDto2));
     }
+
+    @Test
+    @DisplayName("미용 기록 수정 성공")
+    void updateGroomingSuccess() {
+
+        // given : 모든 속성 값 있을 때
+        PartialGroomingReqDto partialGroomingReqDto1 = new PartialGroomingReqDto();
+        partialGroomingReqDto1.setDescription("목욕");
+        partialGroomingReqDto1.setDate(LocalDate.parse("2025-03-30"));
+        partialGroomingReqDto1.setGroomingType(GroomingType.BATH);
+        // when
+        GroomingInfoResDto groomingInfoResDto1 = diaryService.updateGrooming(testGrooming.getId(), partialGroomingReqDto1);
+
+        // then
+        assertThat(groomingInfoResDto1.getDescription()).isEqualTo(partialGroomingReqDto1.getDescription());
+        assertThat(groomingInfoResDto1.getDate()).isEqualTo(partialGroomingReqDto1.getDate());
+        assertThat(groomingInfoResDto1.getGroomingType()).isEqualTo(partialGroomingReqDto1.getGroomingType());
+
+        // given : 속성 값이 몇개만 있을때
+        PartialGroomingReqDto partialGroomingReqDto2 = new PartialGroomingReqDto();
+        partialGroomingReqDto2.setDate(LocalDate.parse("2025-03-30"));
+        partialGroomingReqDto2.setGroomingType(GroomingType.BATH);
+        // when
+        GroomingInfoResDto groomingInfoResDto2 = diaryService.updateGrooming(testGrooming.getId(), partialGroomingReqDto2);
+
+        // then
+        assertThat(groomingInfoResDto2.getDescription()).isEqualTo(partialGroomingReqDto1.getDescription());
+        assertThat(groomingInfoResDto2.getDate()).isEqualTo(partialGroomingReqDto1.getDate());
+        assertThat(groomingInfoResDto2.getGroomingType()).isEqualTo(partialGroomingReqDto1.getGroomingType());
+    }
+
+
 
 
 
