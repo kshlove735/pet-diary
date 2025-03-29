@@ -11,6 +11,7 @@ import com.myproject.petcare.pet_diary.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StringUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -65,7 +66,9 @@ public class PetService {
         pet.setBirthDate(partialPetReqDto.getBirthDate());
         pet.setGender(partialPetReqDto.getGender());
         pet.setWeight(partialPetReqDto.getWeight());
-        pet.setDescription(partialPetReqDto.getDescription());
+        if(StringUtils.hasText(partialPetReqDto.getDescription())){
+            pet.setDescription(partialPetReqDto.getDescription());
+        }
 
         return getPetInfoResDto(pet);
     }

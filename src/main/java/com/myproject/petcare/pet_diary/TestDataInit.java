@@ -38,7 +38,7 @@ public class TestDataInit {
         pet.setBirthDate(LocalDate.parse("1993-10-20"));
         pet.setGender(Gender.FEMALE);
         pet.setWeight(new BigDecimal("5.23"));
-        pet.setDescription(null);
+        pet.setDescription("설명");
         pet.changeUser(user);
         petRepository.save(pet);
     }
