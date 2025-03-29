@@ -26,7 +26,9 @@ public class Behavior extends Diary{
     @Comment("강도(낮음, 보통, 높음)")
     private BehaviorIntensity behaviorIntensity;
 
-    public Behavior(Pet pet, LocalDate date, String description) {
+    public Behavior(Pet pet, LocalDate date, String description, String behaviorType, BehaviorIntensity behaviorIntensity) {
         super(pet, date, description);
+        this.behaviorType = behaviorType;
+        this.behaviorIntensity = behaviorIntensity;
     }
 }

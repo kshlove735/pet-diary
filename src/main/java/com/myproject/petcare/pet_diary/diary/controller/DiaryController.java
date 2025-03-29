@@ -45,6 +45,26 @@ public class DiaryController {
         return new ResponseDto<>(true, "식사 기록 등록 성공", mealInfoResDto);
     }
 
+    @PostMapping("/diary/{petId}/activity")
+    @ResponseStatus(HttpStatus.CREATED)
+    public ResponseDto<ActivityInfoResDto> createActivity(
+            @PathVariable("petId") Long petId,
+            @RequestBody @Validated PartialActivityReqDto partialActivityReqDto
+    ){
+        ActivityInfoResDto activityInfoResDto = diaryService.createActivity(petId, partialActivityReqDto);
+        return new ResponseDto<>(true, "운동 기록 등록 성공", activityInfoResDto);
+    }
+
+    @PostMapping("/diary/{petId}/behavior")
+    @ResponseStatus(HttpStatus.CREATED)
+    public ResponseDto<BehaviorInfoResDto> createBehavior(
+            @PathVariable("petId") Long petId,
+            @RequestBody @Validated PartialBehaviorReqDto partialMealReqDto
+    ){
+        BehaviorInfoResDto behaviorInfoResDto = diaryService.createBehavior(petId, partialMealReqDto);
+        return new ResponseDto<>(true, "행동 기록 등록 성공", behaviorInfoResDto);
+    }
+
     @PutMapping("/diary/{diaryId}/health")
     public ResponseDto<HealthInfoResDto> updateHealth(
             @PathVariable("diaryId") Long diaryId,
@@ -70,5 +90,23 @@ public class DiaryController {
     ){
         MealInfoResDto mealInfoResDto = diaryService.updateMeal(diaryId, partialMealReqDto);
         return new ResponseDto<>(true, "식사 기록 수정 성공", mealInfoResDto);
+    }
+
+    @PutMapping("/diary/{diaryId}/activity")
+    public ResponseDto<ActivityInfoResDto> updateActivity(
+            @PathVariable("diaryId") Long diaryId,
+            @RequestBody @Validated PartialActivityReqDto partialActivityReqDto
+    ){
+        ActivityInfoResDto activityInfoResDto = diaryService.updateActivity(diaryId, partialActivityReqDto);
+        return new ResponseDto<>(true, "운동 기록 수정 성공", activityInfoResDto);
+    }
+
+    @PutMapping("/diary/{diaryId}/behavior")
+    public ResponseDto<BehaviorInfoResDto> updateBehavior(
+            @PathVariable("diaryId") Long diaryId,
+            @RequestBody @Validated PartialBehaviorReqDto partialBehaviorReqDto
+    ){
+        BehaviorInfoResDto behaviorInfoResDto = diaryService.updateBehavior(diaryId, partialBehaviorReqDto);
+        return new ResponseDto<>(true, "행동 기록 수정 성공", behaviorInfoResDto);
     }
 }

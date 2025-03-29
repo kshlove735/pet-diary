@@ -1,12 +1,8 @@
 package com.myproject.petcare.pet_diary.health.service;
 
 import com.myproject.petcare.pet_diary.diary.dto.*;
-import com.myproject.petcare.pet_diary.diary.entity.Grooming;
-import com.myproject.petcare.pet_diary.diary.entity.Health;
-import com.myproject.petcare.pet_diary.diary.entity.Meal;
-import com.myproject.petcare.pet_diary.diary.enums.GroomingType;
-import com.myproject.petcare.pet_diary.diary.enums.HealthType;
-import com.myproject.petcare.pet_diary.diary.enums.MealType;
+import com.myproject.petcare.pet_diary.diary.entity.*;
+import com.myproject.petcare.pet_diary.diary.enums.*;
 import com.myproject.petcare.pet_diary.diary.repository.DiaryRepository;
 import com.myproject.petcare.pet_diary.diary.service.DiaryService;
 import com.myproject.petcare.pet_diary.jwt.CustomUserDetails;
@@ -58,6 +54,8 @@ class HealthServiceTest {
     private Health testHealth;
     private Grooming testGrooming;
     private Meal testMeal;
+    private Activity testActivity;
+    private Behavior testBehavior;
     private CustomUserDetails customUserDetails;
 
     @BeforeEach
@@ -106,6 +104,24 @@ class HealthServiceTest {
         testMeal.setFoodBrand("로얄캐닌 미니 어덜트");
         testMeal.setFoodAmount(100);
         diaryRepository.save(testMeal);
+
+        testActivity = new Activity();
+        testActivity.setPet(testPet);
+        testActivity.setDescription("오늘 첫 한강 산책을 했습니다. 다른 강아지들과 잘 어울리고 활기차게 놀았습니다. 날씨가 좋아서 평소보다 더 오래 산책했습니다.");
+        testActivity.setDate(LocalDate.parse("2025-03-25"));
+        testActivity.setActivityType(ActivityType.WALK);
+        testActivity.setDuration(45);
+        testActivity.setDistance(new BigDecimal(2));
+        testActivity.setLocation("한강공원");
+        diaryRepository.save(testActivity);
+
+        testBehavior = new Behavior();
+        testBehavior.setPet(testPet);
+        testBehavior.setDescription("오늘 첫 한강 산책을 했습니다. 다른 강아지들과 잘 어울리고 활기차게 놀았습니다. 날씨가 좋아서 평소보다 더 오래 산책했습니다.");
+        testBehavior.setDate(LocalDate.parse("2025-03-25"));
+        testBehavior.setBehaviorType("분리불안");
+        testBehavior.setBehaviorIntensity(BehaviorIntensity.HIGH);
+        diaryRepository.save(testBehavior);
     }
 
     @Test
@@ -354,5 +370,150 @@ class HealthServiceTest {
         assertThat(mealInfoResDto1.getMealType()).isEqualTo(partialMealReqDto1.getMealType());
         assertThat(mealInfoResDto1.getFoodBrand()).isEqualTo(partialMealReqDto1.getFoodBrand());
         assertThat(mealInfoResDto1.getFoodAmount()).isEqualTo(partialMealReqDto1.getFoodAmount());
+    }
+
+    @Test
+    @DisplayName("운동 기록 등록 성공")
+    void createActivitySuccess() {
+
+        // given : 모든 속성 값 있을 때
+        PartialActivityReqDto partialActivityReqDto = new PartialActivityReqDto();
+        partialActivityReqDto.setDescription("오늘 첫 한강 산책을 했습니다. 다른 강아지들과 잘 어울리고 활기차게 놀았습니다. 날씨가 좋아서 평소보다 더 오래 산책했습니다.");
+        partialActivityReqDto.setDate(LocalDate.parse("2025-03-25"));
+        partialActivityReqDto.setActivityType(ActivityType.WALK);
+        partialActivityReqDto.setDuration(45);
+        partialActivityReqDto.setDistance(new BigDecimal(2));
+        partialActivityReqDto.setLocation("한강공원");
+
+
+        // when
+        ActivityInfoResDto activityInfoResDto = diaryService.createActivity(testPet.getId(), partialActivityReqDto);
+
+        // then
+        assertThat(activityInfoResDto.getDescription()).isEqualTo(partialActivityReqDto.getDescription());
+        assertThat(activityInfoResDto.getDate()).isEqualTo(partialActivityReqDto.getDate());
+        assertThat(activityInfoResDto.getActivityType()).isEqualTo(partialActivityReqDto.getActivityType());
+        assertThat(activityInfoResDto.getDuration()).isEqualTo(partialActivityReqDto.getDuration());
+        assertThat(activityInfoResDto.getDistance()).isEqualTo(partialActivityReqDto.getDistance());
+        assertThat(activityInfoResDto.getLocation()).isEqualTo(partialActivityReqDto.getLocation());
+    }
+
+    @Test
+    @DisplayName("운동 기록 등록 실패 - 필수 속성 값 없음")
+    void createActivityFail() {
+
+        // given : 필수 속성 값이 없을 때
+        PartialActivityReqDto partialActivityReqDto1 = new PartialActivityReqDto();
+        partialActivityReqDto1.setDescription("오늘 첫 한강 산책을 했습니다. 다른 강아지들과 잘 어울리고 활기차게 놀았습니다. 날씨가 좋아서 평소보다 더 오래 산책했습니다.");
+        partialActivityReqDto1.setDate(LocalDate.parse("2025-03-25"));
+        partialActivityReqDto1.setDuration(45);
+        partialActivityReqDto1.setDistance(new BigDecimal(2));
+        partialActivityReqDto1.setLocation("한강공원");
+
+        // when & then
+        assertThrows(DataIntegrityViolationException.class, () -> diaryService.createActivity(testPet.getId(), partialActivityReqDto1));
+
+
+        // given : 필수 속성 값이 없을 때
+        PartialActivityReqDto partialActivityReqDto2 = new PartialActivityReqDto();
+        partialActivityReqDto2.setDescription("오늘 첫 한강 산책을 했습니다. 다른 강아지들과 잘 어울리고 활기차게 놀았습니다. 날씨가 좋아서 평소보다 더 오래 산책했습니다.");
+        partialActivityReqDto2.setActivityType(ActivityType.WALK);
+        partialActivityReqDto2.setDuration(45);
+        partialActivityReqDto2.setDistance(new BigDecimal(2));
+        partialActivityReqDto2.setLocation("한강공원");
+
+        // when & then
+        assertThrows(DataIntegrityViolationException.class, () -> diaryService.createActivity(testPet.getId(), partialActivityReqDto2));
+    }
+
+    @Test
+    @DisplayName("운동 기록 수정 성공")
+    void updateActivitySuccess() {
+
+        // given : 모든 속성 값 있을 때
+        PartialActivityReqDto partialActivityReqDto = new PartialActivityReqDto();
+        partialActivityReqDto.setDescription("기본 복종 훈련을 진행했습니다. '앉아', '기다려' 명령에 잘 반응하기 시작했습니다. 트레이너가 일주일에 2번 정도 훈련을 추천했습니다.");
+        partialActivityReqDto.setDate(LocalDate.parse("2025-03-28"));
+        partialActivityReqDto.setActivityType(ActivityType.TRAINING);
+        partialActivityReqDto.setDuration(30);
+        partialActivityReqDto.setDistance(new BigDecimal(0));
+        partialActivityReqDto.setLocation("펫 트레이닝 센터");
+
+        // when
+        ActivityInfoResDto activityInfoResDto = diaryService.updateActivity(testActivity.getId(), partialActivityReqDto);
+
+        // then
+        assertThat(activityInfoResDto.getDescription()).isEqualTo(partialActivityReqDto.getDescription());
+        assertThat(activityInfoResDto.getDate()).isEqualTo(partialActivityReqDto.getDate());
+        assertThat(activityInfoResDto.getActivityType()).isEqualTo(partialActivityReqDto.getActivityType());
+        assertThat(activityInfoResDto.getDuration()).isEqualTo(partialActivityReqDto.getDuration());
+        assertThat(activityInfoResDto.getDistance()).isEqualTo(partialActivityReqDto.getDistance());
+        assertThat(activityInfoResDto.getLocation()).isEqualTo(partialActivityReqDto.getLocation());
+    }
+
+    @Test
+    @DisplayName("행동 기록 등록 성공")
+    void createBehaviorSuccess() {
+
+        // given : 모든 속성 값 있을 때
+        PartialBehaviorReqDto partialBehaviorReqDto = new PartialBehaviorReqDto();
+        partialBehaviorReqDto.setDescription("오늘 첫 한강 산책을 했습니다. 다른 강아지들과 잘 어울리고 활기차게 놀았습니다. 날씨가 좋아서 평소보다 더 오래 산책했습니다.");
+        partialBehaviorReqDto.setDate(LocalDate.parse("2025-03-25"));
+        partialBehaviorReqDto.setBehaviorType("분리불안");
+        partialBehaviorReqDto.setBehaviorIntensity(BehaviorIntensity.HIGH);
+
+        // when
+        BehaviorInfoResDto behaviorInfoResDto = diaryService.createBehavior(testPet.getId(), partialBehaviorReqDto);
+
+        // then
+        assertThat(behaviorInfoResDto.getDescription()).isEqualTo(partialBehaviorReqDto.getDescription());
+        assertThat(behaviorInfoResDto.getDate()).isEqualTo(partialBehaviorReqDto.getDate());
+        assertThat(behaviorInfoResDto.getBehaviorType()).isEqualTo(partialBehaviorReqDto.getBehaviorType());
+        assertThat(behaviorInfoResDto.getBehaviorIntensity()).isEqualTo(partialBehaviorReqDto.getBehaviorIntensity());
+    }
+
+    @Test
+    @DisplayName("행동 기록 등록 실패 - 필수 속성 값 없음")
+    void createBehaviorFail() {
+
+        // given : 필수 속성 값이 없을 때
+        PartialBehaviorReqDto partialBehaviorReqDto1 = new PartialBehaviorReqDto();
+        partialBehaviorReqDto1.setDescription("오늘 첫 한강 산책을 했습니다. 다른 강아지들과 잘 어울리고 활기차게 놀았습니다. 날씨가 좋아서 평소보다 더 오래 산책했습니다.");
+        partialBehaviorReqDto1.setDate(LocalDate.parse("2025-03-25"));
+        partialBehaviorReqDto1.setBehaviorIntensity(BehaviorIntensity.HIGH);
+
+        // when & then
+        assertThrows(DataIntegrityViolationException.class, () -> diaryService.createBehavior(testPet.getId(), partialBehaviorReqDto1));
+
+
+        // given : 필수 속성 값이 없을 때
+        PartialBehaviorReqDto partialBehaviorReqDto2 = new PartialBehaviorReqDto();
+        partialBehaviorReqDto2.setDescription("오늘 첫 한강 산책을 했습니다. 다른 강아지들과 잘 어울리고 활기차게 놀았습니다. 날씨가 좋아서 평소보다 더 오래 산책했습니다.");
+        partialBehaviorReqDto2.setDate(LocalDate.parse("2025-03-25"));
+        partialBehaviorReqDto2.setBehaviorType("분리불안");
+
+        // when & then
+        assertThrows(DataIntegrityViolationException.class, () -> diaryService.createBehavior(testPet.getId(), partialBehaviorReqDto2));
+    }
+
+    @Test
+    @DisplayName("행동 기록 수정 성공")
+    void updateBehaviorSuccess() {
+
+        // given : 모든 속성 값 있을 때
+        PartialBehaviorReqDto partialBehaviorReqDto = new PartialBehaviorReqDto();
+        partialBehaviorReqDto.setDescription("오늘 첫 한강 산책을 했습니다. 다른 강아지들과 잘 어울리고 활기차게 놀았습니다. 날씨가 좋아서 평소보다 더 오래 산책했습니다.");
+        partialBehaviorReqDto.setDate(LocalDate.parse("2025-03-25"));
+        partialBehaviorReqDto.setBehaviorType("공격성");
+        partialBehaviorReqDto.setBehaviorIntensity(BehaviorIntensity.MEDIUM);
+
+        // when
+        BehaviorInfoResDto behaviorInfoResDto = diaryService.createBehavior(testPet.getId(), partialBehaviorReqDto);
+
+        // then
+        assertThat(behaviorInfoResDto.getDescription()).isEqualTo(partialBehaviorReqDto.getDescription());
+        assertThat(behaviorInfoResDto.getDate()).isEqualTo(partialBehaviorReqDto.getDate());
+        assertThat(behaviorInfoResDto.getBehaviorType()).isEqualTo(partialBehaviorReqDto.getBehaviorType());
+        assertThat(behaviorInfoResDto.getBehaviorIntensity()).isEqualTo(partialBehaviorReqDto.getBehaviorIntensity());
     }
 }
