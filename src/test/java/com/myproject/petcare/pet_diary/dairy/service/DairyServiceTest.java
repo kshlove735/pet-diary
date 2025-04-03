@@ -1,4 +1,4 @@
-package com.myproject.petcare.pet_diary.health.service;
+package com.myproject.petcare.pet_diary.dairy.service;
 
 import com.myproject.petcare.pet_diary.diary.dto.*;
 import com.myproject.petcare.pet_diary.diary.entity.*;
@@ -31,7 +31,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 @SpringBootTest
 @RequiredArgsConstructor
 @Transactional
-class HealthServiceTest {
+class DairyServiceTest {
 
     @Autowired
     private BCryptPasswordEncoder bCryptPasswordEncoder;
@@ -508,7 +508,7 @@ class HealthServiceTest {
         partialBehaviorReqDto.setBehaviorIntensity(BehaviorIntensity.MEDIUM);
 
         // when
-        BehaviorInfoResDto behaviorInfoResDto = diaryService.createBehavior(testPet.getId(), partialBehaviorReqDto);
+        BehaviorInfoResDto behaviorInfoResDto = diaryService.updateBehavior(testBehavior.getId(), partialBehaviorReqDto);
 
         // then
         assertThat(behaviorInfoResDto.getDescription()).isEqualTo(partialBehaviorReqDto.getDescription());
@@ -516,4 +516,16 @@ class HealthServiceTest {
         assertThat(behaviorInfoResDto.getBehaviorType()).isEqualTo(partialBehaviorReqDto.getBehaviorType());
         assertThat(behaviorInfoResDto.getBehaviorIntensity()).isEqualTo(partialBehaviorReqDto.getBehaviorIntensity());
     }
+
+    /**
+     * TODO : 테스트코드 작성
+     */
+    @Test
+    @DisplayName("일기 리스트 조회(페이징) 성공")
+    void getDiaryListSuccess() {}
+
+    @Test
+    @DisplayName("일기 삭제 성공")
+    void deleteDiarySuccess() {}
+
 }
