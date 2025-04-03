@@ -7,9 +7,13 @@ import com.myproject.petcare.pet_diary.diary.repository.DiaryRepository;
 import com.myproject.petcare.pet_diary.pet.entity.Pet;
 import com.myproject.petcare.pet_diary.pet.repository.PetRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
+
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -18,6 +22,14 @@ public class DiaryService {
 
     private final PetRepository petRepository;
     private final DiaryRepository diaryRepository;
+
+    public Page<DiaryInfoWithJoinResDto> getDiaryList(Long petId, List<String> dtype, Pageable pageable) {
+        Page<Diary> page = diaryRepository.findByPetIdAndDtype(petId, dtype, pageable);
+
+        Page<DiaryInfoWithJoinResDto> diaryInfoWithJoinResDtos = page.map(d -> new DiaryInfoWithJoinResDto(d));
+
+        return diaryInfoWithJoinResDtos;
+    }
 
 
     @Transactional
@@ -173,11 +185,11 @@ public class DiaryService {
 
         }
 
-        if(partialActivityReqDto.getDistance() != null){
+        if (partialActivityReqDto.getDistance() != null) {
             activity.setDistance(partialActivityReqDto.getDistance());
         }
 
-        if(StringUtils.hasText(partialActivityReqDto.getLocation())){
+        if (StringUtils.hasText(partialActivityReqDto.getLocation())) {
             activity.setLocation(partialActivityReqDto.getLocation());
         }
 
@@ -195,7 +207,7 @@ public class DiaryService {
     public BehaviorInfoResDto updateBehavior(Long diaryId, PartialBehaviorReqDto partialBehaviorReqDto) {
         Behavior behavior = (Behavior) diaryRepository.findById(diaryId).orElseThrow(() -> new NotFoundException("해당하는 일기가 없습니다."));
 
-        if(StringUtils.hasText(partialBehaviorReqDto.getBehaviorType())){
+        if (StringUtils.hasText(partialBehaviorReqDto.getBehaviorType())) {
             behavior.setBehaviorType(partialBehaviorReqDto.getBehaviorType());
         }
 

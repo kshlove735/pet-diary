@@ -13,7 +13,7 @@ import java.time.LocalDate;
 @Entity
 @Getter
 @Setter
-@DiscriminatorValue("Behavior")
+@DiscriminatorValue("behavior")
 @NoArgsConstructor
 public class Behavior extends Diary{
 

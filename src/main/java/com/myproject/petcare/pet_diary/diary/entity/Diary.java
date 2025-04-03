@@ -37,9 +37,32 @@ public class Diary extends BaseEntity {
     @Comment("추가 메모")
     private String description;
 
+    @Column(name = "dtype", insertable = false, updatable = false) // 읽기 전용
+    @Comment("구분 컬럼")
+    private String dtype;
+
     public Diary(Pet pet, LocalDate date, String description) {
         this.pet = pet;
         this.date = date;
         this.description = description;
+    }
+
+    // Dtype getter 추가
+    public String getDtype() {
+        String className = this.getClass().getSimpleName();
+        switch (className) {
+            case "Activity":
+                return "activity";
+            case "Behavior":
+                return "Behavior";
+            case "Grooming":
+                return "grooming";
+            case "Health":
+                return "health";
+            case "Meal":
+                return "meal";
+            default:
+                return "Diary"; // 부모 클래스 기본값
+        }
     }
 }
