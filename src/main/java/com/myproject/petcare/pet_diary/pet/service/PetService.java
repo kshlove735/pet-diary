@@ -1,6 +1,7 @@
 package com.myproject.petcare.pet_diary.pet.service;
 
 import com.myproject.petcare.pet_diary.common.exception.custom_exception.NotFoundException;
+import com.myproject.petcare.pet_diary.common.exception.custom_exception.UnauthorizedException;
 import com.myproject.petcare.pet_diary.jwt.CustomUserDetails;
 import com.myproject.petcare.pet_diary.pet.dto.PartialPetReqDto;
 import com.myproject.petcare.pet_diary.pet.dto.PetInfoResDto;
@@ -15,6 +16,7 @@ import org.springframework.util.StringUtils;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 @Service
 @RequiredArgsConstructor
@@ -74,8 +76,14 @@ public class PetService {
     }
 
     @Transactional
-    public void deletePet(Long petId) {
+    public void deletePet(Long petId, CustomUserDetails customUserDetails) {
+        // 반려견 조회
         Pet pet = petRepository.findById(petId).orElseThrow(() -> new NotFoundException("해당하는 반려견이 없습니다."));
+
+        // 권한 확인 : 현재 사용자가 해당 Pet의 소유자인지 확인
+        if(!Objects.equals(pet.getUser().getId(), Long.valueOf(customUserDetails.getUsername()))){
+            throw new UnauthorizedException("해당 반려견을 삭제할 권한이 없습니다.");
+        }
         petRepository.delete(pet);
     }
 

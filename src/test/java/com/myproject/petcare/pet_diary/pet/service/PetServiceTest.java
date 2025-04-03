@@ -180,7 +180,7 @@ class PetServiceTest {
         // given
 
         // when
-        petService.deletePet(testPet1.getId());
+        petService.deletePet(testPet1.getId(), customUserDetails);
 
         //then
         assertThrows(NotFoundException.class, () -> petService.getPet(testPet1.getId()));

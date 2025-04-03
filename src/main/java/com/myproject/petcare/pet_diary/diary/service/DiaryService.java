@@ -231,7 +231,7 @@ public class DiaryService {
         // 일기 조회
         Diary diary = diaryRepository.findById(diaryId).orElseThrow(() -> new NotFoundException("해당하는 일기가 없습니다."));
 
-        // 권한 확인 : 현재 사용자가 해당 Pet의 소유자인지 확인
+        // 권한 확인 : 현재 사용자가 해당 Pet, Dairy의 소유자인지 확인
         if(!Objects.equals(diary.getPet().getUser().getId(), Long.valueOf(customUserDetails.getUsername()))){
             throw new UnauthorizedException("해당 일기를 삭제할 권한이 없습니다.");
         }

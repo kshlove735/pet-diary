@@ -1,6 +1,7 @@
 package com.myproject.petcare.pet_diary.pet.entity;
 
 import com.myproject.petcare.pet_diary.common.entity.BaseEntity;
+import com.myproject.petcare.pet_diary.diary.entity.Diary;
 import com.myproject.petcare.pet_diary.pet.enums.Gender;
 import com.myproject.petcare.pet_diary.user.entity.User;
 import jakarta.persistence.*;
@@ -10,6 +11,8 @@ import org.hibernate.annotations.Comment;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Getter
@@ -51,6 +54,10 @@ public class Pet extends BaseEntity {
     @Column(columnDefinition = "TEXT")
     @Comment("특이사항")
     private String description;
+
+    @OneToMany(mappedBy = "pet", cascade = CascadeType.REMOVE, orphanRemoval = true)
+    @Comment("반려동물의 일기 목록")
+    private List<Diary> diaries = new ArrayList<>();
 
     public void changeUser(User user) {
         this.user = user;

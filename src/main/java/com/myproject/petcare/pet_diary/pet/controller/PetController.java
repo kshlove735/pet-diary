@@ -57,9 +57,12 @@ public class PetController {
     }
 
     @DeleteMapping("/pet/{petId}")
-    public ResponseDto<PetInfoResDto> deletePet(@PathVariable("petId") Long petId) {
+    public ResponseDto<PetInfoResDto> deletePet(
+            @PathVariable("petId") Long petId,
+            @AuthenticationPrincipal CustomUserDetails customUserDetails
+    ) {
 
-        petService.deletePet(petId);
+        petService.deletePet(petId, customUserDetails);
 
         return new ResponseDto<>(true, "반려견 정보 삭제 성공", null);
     }
