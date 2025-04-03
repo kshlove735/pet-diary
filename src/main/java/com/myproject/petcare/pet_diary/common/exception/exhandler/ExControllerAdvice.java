@@ -1,6 +1,7 @@
 package com.myproject.petcare.pet_diary.common.exception.exhandler;
 
 import com.myproject.petcare.pet_diary.common.dto.ResponseDto;
+import com.myproject.petcare.pet_diary.common.exception.custom_exception.UnauthorizedException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -41,6 +42,12 @@ public class ExControllerAdvice {
     public ResponseEntity<ResponseDto> handleMissingRequestCookieException(MissingRequestCookieException e){
         log.error("[exceptionHandler] MissingRequestCookieException", e);
         return new ResponseEntity<>(new ResponseDto(false, e.getMessage()), HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(UnauthorizedException.class)
+    public ResponseEntity<ResponseDto> handleUnauthorizedException(UnauthorizedException e){
+        log.error("[exceptionHandler] UnauthorizedException", e);
+        return new ResponseEntity<>(new ResponseDto(false, e.getMessage()), HttpStatus.UNAUTHORIZED);
     }
 
     @ExceptionHandler(RuntimeException.class)

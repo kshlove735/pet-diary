@@ -3,10 +3,12 @@ package com.myproject.petcare.pet_diary.diary.controller;
 import com.myproject.petcare.pet_diary.common.dto.ResponseDto;
 import com.myproject.petcare.pet_diary.diary.dto.*;
 import com.myproject.petcare.pet_diary.diary.service.DiaryService;
+import com.myproject.petcare.pet_diary.jwt.CustomUserDetails;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
@@ -19,7 +21,6 @@ public class DiaryController {
 
     private final DiaryService diaryService;
 
-    // TODO : Querydsl로 join문 제거
     @GetMapping("/diary/{petId}")
     public ResponseDto<Page<DiaryInfoWithJoinResDto>> getDiaryList(
             @PathVariable("petId") Long petId,
@@ -123,5 +124,14 @@ public class DiaryController {
     ) {
         BehaviorInfoResDto behaviorInfoResDto = diaryService.updateBehavior(diaryId, partialBehaviorReqDto);
         return new ResponseDto<>(true, "행동 기록 수정 성공", behaviorInfoResDto);
+    }
+
+    @DeleteMapping("/diary/{diaryId}")
+    public ResponseDto deleteDiary(
+            @PathVariable("diaryId") Long diaryId,
+            @AuthenticationPrincipal CustomUserDetails customUserDetails
+    ) {
+        diaryService.deleteDiary(diaryId, customUserDetails);
+        return new ResponseDto<>(true, "일기 삭제 성공", null);
     }
 }
