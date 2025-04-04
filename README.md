@@ -15,7 +15,7 @@ PetCare는 반려동물의 일상 관리를 지원하는 웹/모바일 애플리
 ## 기술 스택
 - 언어: Java 17
 - 프레임워크: Spring Boot 3.4.2
-- 데이터베이스: MySQL (운영), H2 (테스트, 주석 처리됨)
+- 데이터베이스: MySQL
 - ORM: Spring Data JPA, Hibernate, QueryDSL 5.0.0
 - 보안: Spring Security, JWT (jjwt 0.12.3)
 - 빌드 도구: Gradle (Spring Dependency Management 1.1.7)
